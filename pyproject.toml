@@ -1,0 +1,40 @@
+[project]
+name = "meleon"
+version = "0.3.0"
+description = " 🦎 Adaptive OCR data extraction library - Transform ALTO and PageXML to PyArrow/Parquet"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Apache-2.0"}
+authors = [{name = "Borg93", email = "gabriel.borg@riksarkivet.se"}]
+keywords = ["ocr", "alto", "pagexml", "parquet", "pyarrow", "data-extraction", "xml-parsing"]
+
+dependencies = [
+    "pydantic>=2.11.9",
+    "pyarrow>=2.11.9",
+    "narwhals>=2.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.2",
+    "ruff>=2.5.0",
+]
+cli = [
+    "typer>=0.19.2",
+    "rich>=14.1.0",
+]
+
+[project.scripts]
+meleon = "meleon.cli:app"
+
+[build-system]
+requires = ["uv_build>=0.8.18"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

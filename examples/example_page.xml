@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PcGts xmlns="http://schema.primaresearch.org/PAGE/gts/pagecontent/2019-07-15" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schema.primaresearch.org/PAGE/gts/pagecontent/2019-07-15 http://schema.primaresearch.org/PAGE/gts/pagecontent/2019-07-15/pagecontent.xsd">
+    <Metadata>
+        <Creator>ai@riksarkivet.se</Creator>
+        <Created>2025-09-22T05:47:17.689292</Created>
+        <LastChange>2025-09-22T05:47:17.689292</LastChange>
+    </Metadata>
+    <Page imageFilename="30002027_00008.jpg" imageWidth="5051" imageHeight="4057">
+        <ReadingOrder>
+            <OrderedGroup id='ro'>
+            <OrderedGroupIndexed id="ro_30002027_00008_node0" index="0">
+            <RegionRefIndexed regionRef="30002027_00008_node0_node0" index="0"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node1" index="1"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node2" index="2"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node3" index="3"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node4" index="4"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node5" index="5"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node6" index="6"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node7" index="7"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node8" index="8"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node9" index="9"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node10" index="10"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node11" index="11"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node12" index="12"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node13" index="13"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node14" index="14"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node15" index="15"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node16" index="16"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node17" index="17"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node18" index="18"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node19" index="19"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node20" index="20"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node21" index="21"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node22" index="22"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node23" index="23"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node24" index="24"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node25" index="25"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node26" index="26"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node27" index="27"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node28" index="28"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node29" index="29"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node30" index="30"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node31" index="31"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node32" index="32"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node33" index="33"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node34" index="34"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node35" index="35"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node36" index="36"/>
+            <RegionRefIndexed regionRef="30002027_00008_node0_node37" index="37"/>
+            </OrderedGroupIndexed>
+            <OrderedGroupIndexed id="ro_30002027_00008_node1" index="1">
+            <RegionRefIndexed regionRef="30002027_00008_node1_node0" index="0"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node1" index="1"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node2" index="2"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node3" index="3"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node4" index="4"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node5" index="5"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node6" index="6"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node7" index="7"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node8" index="8"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node9" index="9"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node10" index="10"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node11" index="11"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node12" index="12"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node13" index="13"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node14" index="14"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node15" index="15"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node16" index="16"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node17" index="17"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node18" index="18"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node19" index="19"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node20" index="20"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node21" index="21"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node22" index="22"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node23" index="23"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node24" index="24"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node25" index="25"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node26" index="26"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node27" index="27"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node28" index="28"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node29" index="29"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node30" index="30"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node31" index="31"/>
+            <RegionRefIndexed regionRef="30002027_00008_node1_node32" index="32"/>
+            </OrderedGroupIndexed>
+            </OrderedGroup>
+        </ReadingOrder>
+        
+        <TextRegion id="30002027_00008_node0">
+            <Coords points="520,276 520,3677 2375,3677 2375,276" />
+            <TextLine id="30002027_00008_node0_node0">
+            <Coords points="650,387 1543,350 2239,355 2276,339 2281,286 1335,286 1330,307 1112,286 1086,313 650,323" />
+            <TextEquiv conf="0.9963170651338819">
+                <Unicode>pets omkring 300 tt. zink, värdt</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node1">
+            <Coords points="629,467 2223,430 2233,371 1080,371 1075,392 905,371 889,398 809,403 772,371 692,371 629,403" />
+            <TextEquiv conf="0.9992829074272496">
+                <Unicode>25 öre ℔, hvilken Zink förvarats i</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node2">
+            <Coords points="629,552 2303,520 2303,456 1681,456 1676,477 1628,456 1612,477 1112,456 1102,483 953,499 847,456 799,493 629,499" />
+            <TextEquiv conf="0.9983136346750356">
+                <Unicode>en honom tillhörig tillåst smedja,</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node3">
+            <Coords points="629,642 1729,637 2244,600 2255,541 1761,541 1755,562 1633,541 1585,568 1447,568 1426,541 1266,568 1203,541 1181,568 1033,584 740,573 671,541 629,562" />
+            <TextEquiv conf="0.9575791108076805">
+                <Unicode>belägen å ofvanberörde ställe, så¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node4">
+            <Coords points="2345,626 1718,626 1713,647 1601,626 1596,647 804,674 629,658 629,727 2016,711 2345,690" />
+            <TextEquiv conf="0.9982212558522364">
+                <Unicode>har, efter det att af det tillgripne åter</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node5">
+            <Coords points="607,855 692,823 2308,786 2324,764 2297,711 2101,711 2095,733 1978,711 1915,738 1676,711 1590,743 1537,711 1442,743 1245,711 1096,759 607,754" />
+            <TextEquiv conf="0.9672491164605271">
+                <Unicode>funnits 190 ℔. hos Lumphandlan¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node6">
+            <Coords points="2324,796 1994,796 1941,828 1808,796 1718,839 1415,849 1266,828 1155,855 682,849 607,855 607,913 682,940 958,940 995,913 2281,876 2324,860" />
+            <TextEquiv conf="0.9976566598400348">
+                <Unicode>den Tobias Johansson i huset No 138</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node7">
+            <Coords points="2324,924 2303,903 1559,903 1537,929 730,934 607,950 607,1046 703,1046 708,1025 719,1046 836,1046 884,1009 2212,982 2324,972" />
+            <TextEquiv conf="0.9992623393638389">
+                <Unicode>af Mjs 3dje Rote, och 70 ℔ hos Lump¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node8">
+            <Coords points="2303,1019 2297,988 1867,988 1830,1019 1633,1030 1431,1009 1218,1035 687,1030 607,1046 607,1104 2265,1062" />
+            <TextEquiv conf="0.9989042612064403">
+                <Unicode>handlanden C. Svensson i huset No</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node9">
+            <Coords points="2281,1126 2255,1073 1957,1073 1920,1104 1814,1073 1755,1110 607,1126 607,1200 767,1237 831,1200 2249,1163" />
+            <TextEquiv conf="0.9992319322214552">
+                <Unicode>80 af Mjs 2dra Rote, Poliskonstapeln</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node10">
+            <Coords points="2303,1184 2271,1158 2053,1158 2047,1179 2037,1158 1915,1158 1909,1179 1771,1190 1739,1158 1676,1184 1617,1158 1458,1211 607,1216 607,1322 661,1301 783,1322 857,1285 2303,1237" />
+            <TextEquiv conf="0.9979964009045914">
+                <Unicode>No 70 Larsson den 6 ds för detta till¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node11">
+            <Coords points="2324,1243 607,1333 607,1402 836,1402 963,1370 1596,1370 1761,1338 2287,1349 2324,1338" />
+            <TextEquiv conf="0.9369233851441747">
+                <Unicode>grepp anhållit ynglingen Gustaf</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node12">
+            <Coords points="2239,1349 2016,1349 2010,1370 1867,1349 1824,1376 1606,1386 1452,1370 1373,1397 1011,1386 847,1418 607,1407 607,1471 1314,1471 1404,1445 2239,1407" />
+            <TextEquiv conf="0.9996660338966592">
+                <Unicode>Adolf Carling, hvilken vid det</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node13">
+            <Coords points="2032,1413 2032,1466 2159,1466 2180,1476 2180,1492 2223,1492 2223,1476 2228,1471 2303,1471 2329,1450 2345,1450 2345,1445 2329,1445 2324,1439 2324,1413" />
+            <TextEquiv conf="0.686584394367024">
+                <Unicode>vidgått</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node14">
+            <Coords points="607,1577 1490,1530 2095,1540 2303,1514 2271,1455 2228,1476 2170,1455 1404,1455 1389,1482 607,1503" />
+            <TextEquiv conf="0.9542013665582219">
+                <Unicode>med honom anstäldt förhör upp¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node15">
+            <Coords points="607,1662 2297,1604 2324,1572 2297,1540 1681,1540 1660,1567 1373,1577 1272,1540 1218,1583 979,1567 607,1604" />
+            <TextEquiv conf="0.9424893081516269">
+                <Unicode>gifvit, att han, som bott i Sandvi¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node16">
+            <Coords points="2281,1662 2276,1625 1739,1625 1734,1647 1665,1625 1633,1652 1203,1647 1102,1673 857,1657 586,1673 586,1742 2133,1694" />
+            <TextEquiv conf="0.998197744556534">
+                <Unicode>ken hos sin faller Arbetskarlen Carl</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node17">
+            <Coords points="2260,1710 1904,1710 1899,1732 1840,1710 1776,1742 1649,1710 1606,1742 1351,1758 607,1753 607,1854 676,1827 2021,1801 2260,1774" />
+            <TextEquiv conf="0.9964678781140843">
+                <Unicode>Johan Carling, hvit för sistl. Jul</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node18">
+            <Coords points="607,1923 746,1939 1351,1891 2287,1875 2297,1795 1877,1795 1856,1822 1543,1795 1505,1833 1410,1795 1325,1838 607,1859" />
+            <TextEquiv conf="0.9941678281411997">
+                <Unicode>vid flera olika tillfällen der till</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node19">
+            <Coords points="2324,1880 2026,1880 2000,1907 1633,1918 1585,1880 1521,1880 1484,1912 1330,1933 607,1949 607,2024 2324,1955" />
+            <TextEquiv conf="0.9910521736423656">
+                <Unicode>gripit Ling ur Hellgrens medja¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node20">
+            <Coords points="2324,1965 2090,1965 2085,1987 1962,1965 1941,1992 1527,2013 894,2008 607,2034 607,2109 2324,2040" />
+            <TextEquiv conf="0.9977943461156012">
+                <Unicode>dit han beredt sig inträde medelst</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node21">
+            <Coords points="607,2194 2037,2130 2255,2146 2324,2130 2303,2072 1670,2072 1665,2093 1484,2098 1367,2072 1304,2104 607,2119" />
+            <TextEquiv conf="0.9515994563882179">
+                <Unicode>att inkrypa genom en å ena väg¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node22">
+            <Coords points="607,2279 2287,2236 2297,2194 2281,2157 1745,2157 1718,2183 1436,2183 1383,2157 1330,2189 894,2178 607,2205" />
+            <TextEquiv conf="0.9366463873161911">
+                <Unicode>gen befintlig glugg; att han i min¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node23">
+            <Coords points="607,2290 607,2353 740,2364 746,2385 937,2343 2281,2327 2281,2263 1622,2263 1617,2284 1596,2263 1442,2263 1436,2284 1011,2263 990,2290" />
+            <TextEquiv conf="0.9865034754966746">
+                <Unicode>dra partin till Lumphandlarne.</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node24">
+            <Coords points="607,2470 761,2444 820,2470 979,2470 1027,2433 1543,2444 2218,2396 2218,2348 1564,2348 1516,2375 1452,2348 1197,2348 1192,2369 942,2390 607,2375" />
+            <TextEquiv conf="0.9997808344842379">
+                <Unicode>Johansson och Svensson sålt den</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node25">
+            <Coords points="2303,2433 1527,2433 1479,2465 1054,2476 607,2470 607,2555 650,2534 974,2555 985,2529 1123,2518 1431,2529 1686,2491 2303,2486" />
+            <TextEquiv conf="0.9976518366759136">
+                <Unicode>tillgripne zinken, hvarvid han be¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node26">
+            <Coords points="586,2561 586,2619 634,2640 1484,2598 2303,2598 2303,2555 2228,2518 1899,2518 1893,2539 1851,2518 1729,2518 1723,2539 1420,2518 1357,2555 1256,2555 1192,2518 1139,2555" />
+            <TextEquiv conf="0.950920711678514">
+                <Unicode>hemmet 6 öre för ℔; att då Johans¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node27">
+            <Coords points="2303,2624 2281,2603 1787,2603 1782,2624 1686,2630 1622,2603 1580,2646 868,2635 586,2656 586,2720 841,2747 937,2704 2303,2693" />
+            <TextEquiv conf="0.9998044274907949">
+                <Unicode>son, fordrat innan han köpte något,</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node28">
+            <Coords points="586,2810 2239,2762 2239,2709 1596,2709 1590,2731 1033,2709 1006,2736 900,2709 878,2736 761,2747 666,2709 650,2736 586,2741" />
+            <TextEquiv conf="0.9922617674470489">
+                <Unicode>fordrat, att Carling skulle visa</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node29">
+            <Coords points="586,2895 2303,2858 2303,2794 1702,2794 1697,2816 1144,2794 1118,2821 937,2794 852,2826 655,2794 586,2826" />
+            <TextEquiv conf="0.949321927186473">
+                <Unicode>hvarifrån han bekommit den ut¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node30">
+            <Coords points="586,2901 586,2975 639,3002 852,2970 2138,2975 2303,2954 2303,2901" />
+            <TextEquiv conf="0.9632934878167254">
+                <Unicode>bjudna zinken, han i en diktad per¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node31">
+            <Coords points="586,2986 586,3060 1638,3060 1670,3087 1947,3087 2026,3044 2239,3039 2239,2986" />
+            <TextEquiv conf="0.9994267540733921">
+                <Unicode>sons namn, som han uppgaf vara</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node32">
+            <Coords points="586,3071 586,3150 724,3166 746,3193 815,3150 2265,3145 2303,3113 2276,3071 1250,3071 1245,3092 1240,3071 783,3071 777,3092" />
+            <TextEquiv conf="0.9988931013257748">
+                <Unicode>sin fader, skrifvit bilagde intyg</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node33">
+            <Coords points="607,3241 1676,3241 1835,3214 2218,3225 2260,3193 2239,3156 1288,3156 1282,3177 1118,3156 1096,3182 735,3182 719,3156 634,3156 607,3177" />
+            <TextEquiv conf="0.9990598023881083">
+                <Unicode>hvarvid han tillika förklarat,</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node34">
+            <Coords points="586,3336 788,3363 852,3320 1952,3326 2249,3310 2255,3241 1590,3241 1585,3262 1569,3241 1314,3241 1309,3262 1229,3267 1165,3241 1102,3267 671,3241 666,3262 586,3267" />
+            <TextEquiv conf="0.9892008851115955">
+                <Unicode>att fadren, som vore egare af rialen</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node35">
+            <Coords points="586,3416 1043,3411 1149,3448 1155,3427 1383,3400 1559,3421 2265,3395 2303,3363 2281,3326 1585,3326 1580,3347 1155,3326 1102,3352 586,3358" />
+            <TextEquiv conf="0.9978634836825612">
+                <Unicode>men sängliggande sjuk, uppdragit</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node36">
+            <Coords points="607,3448 607,3512 2324,3496 2324,3453 2271,3411 1771,3411 1766,3432 1612,3411 1580,3437 1197,3411 1155,3448 894,3448 815,3411 793,3437" />
+            <TextEquiv conf="0.9987139988336488">
+                <Unicode>åt honom att försälja densamma,</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node0_node37">
+            <Coords points="650,3538 650,3597 878,3618 1341,3602 1383,3639 1564,3639 1622,3597 1947,3639 1962,3613 2281,3581 2255,3517 1814,3517 1808,3538 1776,3517 1500,3517 1495,3538 1415,3544 1288,3538 1282,3517 1203,3517 1197,3538 698,3517" />
+            <TextEquiv conf="0.9894843316610642">
+                <Unicode>Lumphandlarne Johansson och</Unicode>
+            </TextEquiv>
+            </TextLine>
+        </TextRegion>
+        <TextRegion id="30002027_00008_node1">
+            <Coords points="2730,276 2730,3898 4553,3898 4553,2288 4451,2115 4553,1562 4553,276" />
+            <TextLine id="30002027_00008_node1_node0">
+            <Coords points="2792,287 2792,366 4484,360 4484,326 4077,315 4048,287" />
+            <TextEquiv conf="0.9867232099046775">
+                <Unicode>Svensson,  hafva uppger som jemväl</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node1">
+            <Coords points="2747,377 2747,457 3364,457 3398,485 3437,462 3454,485 3630,485 3652,457 3918,457 3947,485 4031,485 4048,457 4394,440 4371,377" />
+            <TextEquiv conf="0.998714744679261">
+                <Unicode>blifvit hörde, hafva uppgifvit att</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node2">
+            <Coords points="2747,468 2747,553 2900,564 3035,541 4116,564 4484,530 4484,468" />
+            <TextEquiv conf="0.9970932466372678">
+                <Unicode>de af Carling, på sätt kan uppgifvet</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node3">
+            <Coords points="2747,558 2747,626 4003,632 4456,604 4456,558 3449,558 3443,581 3437,558" />
+            <TextEquiv conf="0.9640429365016241">
+                <Unicode>berättat, köpt de hos den anträf¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node4">
+            <Coords points="2747,757 2826,723 3058,757 3120,723 4439,700 4439,649 2747,649" />
+            <TextEquiv conf="0.9946614952668014">
+                <Unicode>fade partier Zink; Svensson med</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node5">
+            <Coords points="2747,745 2747,813 3035,824 3217,802 4462,807 4462,717 3981,717 3935,745 3845,740 3839,717 3732,717 3698,745 3251,717 3200,751 2962,751 2905,717 2786,717" />
+            <TextEquiv conf="0.9996439142950991">
+                <Unicode>tillägg att som han sett det af</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node6">
+            <Coords points="2747,807 2747,915 3188,915 3194,892 3341,892 3347,915 3822,915 3828,892 3964,915 3998,892 4015,915 4020,892 4462,875 4433,807 4235,807 4230,830 4145,830 4139,807 3986,807 3981,830 3884,830 3879,807 3794,807 3788,830 3205,807 3183,836" />
+            <TextEquiv conf="0.9958180072995809">
+                <Unicode>Carling till Johansson lemnade</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node7">
+            <Coords points="2769,926 2769,989 2945,1006 4484,960 4484,898 3975,898 3969,921 3766,898 3760,921 3590,926 3567,898 3466,926 3335,926 3313,898 3251,898 3234,926 2866,898 2860,921" />
+            <TextEquiv conf="0.9566579092892197">
+                <Unicode>intyget han icke haft någon anled¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node8">
+            <Coords points="2747,1017 2747,1073 2860,1085 2888,1119 2990,1119 3030,1079 4241,1085 4507,1056 4484,989 3901,989 3896,1011 3505,989 3466,1017 3137,989 3115,1017" />
+            <TextEquiv conf="0.9971814902261447">
+                <Unicode>ning att misstänka Carlings åt</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node9">
+            <Coords points="2747,1102 2747,1187 3092,1187 3098,1164 3132,1164 3137,1187 3313,1187 3318,1164 3516,1164 3522,1187 3539,1187 3545,1164 3703,1164 3760,1147 3737,1102" />
+            <TextEquiv conf="0.9893658469881021">
+                <Unicode>komst till zinken.</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node10">
+            <Coords points="2860,1300 2951,1266 4439,1249 4484,1232 4484,1170 3494,1170 3488,1192 3364,1170 3352,1198 2934,1170 2917,1198 2860,1204" />
+            <TextEquiv conf="0.9719135430111506">
+                <Unicode>På grund af hvad sålunda förekom¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node11">
+            <Coords points="2747,1339 3335,1368 3341,1345 4416,1322 4462,1283 4416,1238 4048,1238 4020,1266 3964,1238 3896,1266 3850,1238 3709,1238 3658,1277 3567,1238 3483,1289 2747,1289" />
+            <TextEquiv conf="0.9133571008233832">
+                <Unicode>mit, kommer Gustaf Adolf Car¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node12">
+            <Coords points="2747,1436 2894,1453 3018,1430 3403,1441 4462,1402 4462,1328 3743,1328 3715,1356 3681,1328 3471,1328 3398,1373 2820,1362 2747,1379" />
+            <TextEquiv conf="0.9484785476981722">
+                <Unicode>ling, hvilken blifvit till Cellfän¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node13">
+            <Coords points="2747,1549 2843,1549 2849,1526 2979,1549 3030,1521 3109,1521 3126,1549 3386,1549 3471,1515 4462,1475 4462,1419 4116,1419 4111,1441 4071,1419 3992,1419 3986,1441 3573,1419 3488,1464 2747,1464" />
+            <TextEquiv conf="0.8958602603014396">
+                <Unicode>gelset införpassad, att denna dag</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node14">
+            <Coords points="2747,1634 2809,1662 2843,1634 2888,1634 2900,1662 3018,1662 3081,1617 3771,1622 3850,1594 4162,1583 4303,1600 4394,1560 4394,1509 4009,1509 4003,1532 3743,1509 3726,1538 3420,1509 3358,1555 3058,1538 2747,1566" />
+            <TextEquiv conf="0.9261802883980326">
+                <Unicode>inför Pkn inställas. Gtbg den 9.</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node15">
+            <Coords points="2769,1645 2769,1736 2973,1724 3041,1747 3092,1747 3154,1724 3222,1724 3330,1696 3330,1673 3307,1668 3307,1645 3018,1645 3013,1668 2973,1668 2968,1645" />
+            <TextEquiv conf="0.7367564596668646">
+                <Unicode>Jan. 1874.</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node16">
+            <Coords points="2747,1809 2747,1905 3081,1900 3120,1934 3296,1934 3352,1888 3607,1888 3669,1934 3782,1934 3839,1888 4439,1888 4439,1843 4179,1832 4122,1781 4054,1826 3839,1809 3816,1781 3522,1781 3477,1826 3239,1826 3194,1781 3069,1781 3001,1832 2934,1826 2894,1781 2775,1781" />
+            <TextEquiv conf="0.9995124139749262">
+                <Unicode>Sedan Bryggaren L. Börjesson boende i</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node17">
+            <Coords points="2769,1917 2769,2002 3494,2013 3811,2047 4462,2002 4462,1962 4394,1917 4292,1962 4003,1962 3952,1917 3788,1956 3675,1951 3652,1917 3460,1917 3443,1945 3301,1945 3273,1917" />
+            <TextEquiv conf="0.9998656769630668">
+                <Unicode>huset No 66 vid Fattighusgatan, den 10de</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node18">
+            <Coords points="2769,2030 2769,2115 4247,2160 4416,2137 4377,2098 4173,2070 3901,2081 3709,2053 3618,2081 3471,2070 3420,2030 3352,2058 3273,2058 3256,2030 3137,2030 3103,2058" />
+            <TextEquiv conf="0.9996732438648746">
+                <Unicode>ds anmält, att den 1 eller 2 i denna</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node19">
+            <Coords points="2769,2166 2769,2228 3347,2262 4462,2268 4462,2200 4241,2205 4133,2143 4060,2143 4009,2188 3913,2177 3896,2143 3737,2188 3432,2171 3420,2143 3313,2143 3245,2177 3137,2171 3126,2143 3030,2143 2996,2171" />
+            <TextEquiv conf="0.9996701880137483">
+                <Unicode>månad å kajen vid Lilla Bommens</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node20">
+            <Coords points="2769,2279 2769,2352 3862,2375 4026,2386 4031,2409 4077,2386 4445,2409 4507,2369 4507,2341 4411,2279 4286,2279 4235,2319 4111,2307 4094,2279 3873,2279 3850,2307 3760,2307 3743,2279 3698,2302 3613,2302 3607,2279 3381,2279 3375,2302 3369,2279 3188,2279 3183,2302" />
+            <TextEquiv conf="0.998605914537661">
+                <Unicode>hamn å den plats der Ångbåten Lilla</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node21">
+            <Coords points="2792,2369 2792,2471 4048,2500 4054,2522 4501,2522 4490,2449 4354,2415 4213,2443 4128,2409 3879,2432 3703,2392 3647,2420 3307,2415 3262,2369 3205,2392 3069,2369 3041,2403 2956,2369" />
+            <TextEquiv conf="0.9996420962729307">
+                <Unicode>Edet brukar vara förtöjdt från honom</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node22">
+            <Coords points="2769,2505 2769,2590 2900,2613 3194,2590 3969,2618 4190,2652 4462,2641 4462,2568 4331,2539 4179,2573 4037,2534 3686,2545 3641,2505 3528,2505 3511,2534 3432,2528 3426,2505" />
+            <TextEquiv conf="0.9981839712760475">
+                <Unicode>tillgripits 139 st hela tombuteljer, för¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node23">
+            <Coords points="2769,2618 2769,2686 3573,2703 4094,2743 4394,2743 4416,2720 4382,2675 4133,2675 3935,2641 3822,2658 3743,2641 3737,2618 3607,2618 3601,2641 3477,2618 3443,2647 3375,2641 3369,2618" />
+            <TextEquiv conf="0.9987641489404238">
+                <Unicode>varade i två särskilda lådor, som</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node24">
+            <Coords points="2747,2709 2747,2805 3766,2817 3981,2839 3986,2862 4054,2828 4484,2817 4439,2737 4105,2766 3777,2709 3726,2754 3647,2760 3562,2709 3539,2737 3460,2709 3398,2754 3307,2743 3273,2709 3234,2743 3137,2737 3120,2709" />
+            <TextEquiv conf="0.9707043097807234">
+                <Unicode>uppbrutits, så hafva Konstaplarne J. E¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node25">
+            <Coords points="2747,2845 2747,2913 4484,2958 4484,2907 4365,2867 3850,2884 3766,2845" />
+            <TextEquiv conf="0.9569532293206383">
+                <Unicode>Jönsson och Ed. Haedge för detta till¬</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node26">
+            <Coords points="2747,2958 2747,3049 3879,3060 4054,3105 4479,3077 4473,3009 4411,2992 4292,3015 4179,2981 3867,3003 3811,2958 3743,2986 3669,2986 3652,2958 3607,2986 3545,2958" />
+            <TextEquiv conf="0.9999601495383358">
+                <Unicode>grepp anhållit för snatteri straffade Olof</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node27">
+            <Coords points="2747,3071 2747,3156 3528,3201 4207,3201 4354,3224 4360,3247 4507,3213 4507,3145 3958,3133 3856,3071 3749,3122 3669,3111 3647,3071 3522,3071 3477,3117 3245,3105 3188,3071 3047,3071 3013,3100 2945,3071" />
+            <TextEquiv conf="0.8876156508071733">
+                <Unicode>Peter Andersson från Romelanda socken</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node28">
+            <Coords points="2747,3207 2747,3275 3681,3309 3754,3315 3760,3337 3862,3337 3867,3315 3913,3337 4388,3337 4416,3309 4416,3269 4088,3241 4048,3207 3811,3252 3715,3235 3703,3207 3590,3207 3556,3241 3460,3235 3443,3207 3369,3207 3364,3230 3335,3207" />
+            <TextEquiv conf="0.9998607798169713">
+                <Unicode>och arbetskarlen August Andersson</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node29">
+            <Coords points="2747,3298 2747,3382 4162,3450 4167,3473 4230,3445 4388,3473 4416,3433 4399,3382 4184,3388 4026,3354 3641,3366 3579,3332 3296,3349 3245,3320 3035,3343 2945,3326 2928,3298" />
+            <TextEquiv conf="0.9985781270373583">
+                <Unicode>båda i saknad af bostad, hvilka vid</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node30">
+            <Coords points="2747,3411 2747,3496 4026,3569 4167,3632 4354,3632 4365,3603 4484,3575 4484,3496 4399,3479 4077,3501 3890,3462 3805,3484 3573,3456 3330,3467" />
+            <TextEquiv conf="0.9989653404131886">
+                <Unicode>det med dem anställde förhör uppgifvit</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node31">
+            <Coords points="2747,3569 2747,3677 4416,3745 4416,3643 4224,3665 3935,3620 3624,3643 3352,3615 3296,3569 3245,3569 3200,3615 3132,3615 3081,3569" />
+            <TextEquiv conf="0.9096670009214511">
+                <Unicode>Olof Peter Andersson, att han den 2 ds</Unicode>
+            </TextEquiv>
+            </TextLine>
+            <TextLine id="30002027_00008_node1_node32">
+            <Coords points="2747,3705 2747,3818 2849,3796 3392,3813 3652,3864 3771,3830 4037,3835 4167,3875 4484,3847 4484,3796 4167,3750 3833,3773 3669,3728 3443,3756 3284,3745 3239,3705 3171,3739 3047,3728 3041,3705 3030,3728" />
+            <TextEquiv conf="0.9992430621368321">
+                <Unicode>på e. m. sammanträffat med Asylhjonen</Unicode>
+            </TextEquiv>
+            </TextLine>
+        </TextRegion>
+      
+    </Page>
+</PcGts>
