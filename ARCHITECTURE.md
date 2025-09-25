@@ -163,6 +163,65 @@ flowchart LR
     Table -.-> Track[Auto-tracks source_file]
 ```
 
+### Roundtrip Conversion Flow
+
+```mermaid
+flowchart TB
+    subgraph Parse["Parsing Phase"]
+        XML1[Original ALTO/PageXML]
+        XML1 --> ExtractMeta[Extract Metadata]
+        XML1 --> ExtractData[Extract Text Data]
+        ExtractMeta --> MetaTable[Metadata Table<br/>• XML declaration<br/>• Namespaces<br/>• Processing info<br/>• Custom elements]
+        ExtractData --> DataTable[Data Table<br/>• Text content<br/>• Coordinates<br/>• IDs<br/>• Confidence]
+    end
+
+    subgraph Store["Storage Phase"]
+        DataTable --> Parquet[Parquet File]
+        MetaTable --> ParquetMeta[Metadata Sidecar]
+        Parquet --> |source_file tracked| Dataset[Partitioned Dataset]
+    end
+
+    subgraph Reconstruct["Reconstruction Phase"]
+        Dataset --> LoadTable[Load PyArrow Table]
+        ParquetMeta --> LoadMeta[Load Metadata]
+        LoadTable --> FilterSource{Filter by<br/>source_file}
+        FilterSource --> SourceData[Data for specific file]
+        SourceData --> Serializer[Template-based<br/>Serializer]
+        LoadMeta --> Serializer
+        XML1 -.->|Original as template| Serializer
+        Serializer --> XML2[Reconstructed ALTO/PageXML<br/>with preserved structure]
+    end
+```
+
+### Metadata Preservation Strategy
+
+```mermaid
+flowchart LR
+    subgraph Input["XML Input"]
+        OrigXML[Original XML]
+        Meta[Metadata Elements<br/>• Description<br/>• Processing Software<br/>• Styles<br/>• Layout]
+        Data[Data Elements<br/>• TextBlocks<br/>• TextLines<br/>• Words]
+    end
+
+    subgraph Processing["Processing"]
+        MetaSchema[metadata_schema()<br/>Preserves ALL metadata]
+        DataSchema[ALTO/PageXML Schema<br/>Structured extraction]
+    end
+
+    subgraph Output["PyArrow Output"]
+        MainTable[Main Table<br/>page_id | text | coords | ...]
+        MetaTable[Metadata Table<br/>page_id | format_type | namespaces | ...]
+        MainTable -.->|linked by page_id| MetaTable
+    end
+
+    OrigXML --> Meta
+    OrigXML --> Data
+    Meta --> MetaSchema
+    Data --> DataSchema
+    MetaSchema --> MetaTable
+    DataSchema --> MainTable
+```
+
 ### Batch Processing Flow
 
 ```mermaid
@@ -175,6 +234,34 @@ flowchart TD
     Next --> Iterator
     Yield --> Output[Stream/Table/Parquet]
     Output --> Next
+```
+
+### Batch to Individual XML Reconstruction
+
+```mermaid
+flowchart TB
+    subgraph BatchProcess["Batch Processing"]
+        Files[1000 XML Files] --> Parser[Batch Parser]
+        Parser --> Combined[Combined PyArrow Table<br/>with source_file column]
+        Combined --> Parquet[Single Parquet File<br/>or Partitioned Dataset]
+    end
+
+    subgraph Reconstruction["Individual Reconstruction"]
+        Parquet --> Query[Query by source_file]
+        Query --> |"WHERE source_file='doc_001.xml'"| Filtered[Filtered Table]
+
+        Original[Original doc_001.xml<br/>as template] --> Serializer
+        Filtered --> Serializer[ALTOSerializer/<br/>PageXMLSerializer]
+        Serializer --> Recreated[Recreated doc_001.xml<br/>with original structure]
+    end
+
+    subgraph MultiReconstruction["Bulk Reconstruction"]
+        Parquet --> GroupBy[Group by source_file]
+        GroupBy --> Iterate[For each group]
+        Iterate --> Template[Load original template]
+        Template --> BulkSerialize[Serialize with template]
+        BulkSerialize --> Multiple[Multiple XML files<br/>with preserved structure]
+    end
 ```
 
 ### Cross-Library Processing
@@ -342,6 +429,35 @@ erDiagram
         bool original_schema_valid
         string validation_errors
     }
+
+    ALTO_SCHEMA ||--|| METADATA_SCHEMA : "linked by page_id"
+    PAGEXML_SCHEMA ||--|| METADATA_SCHEMA : "linked by page_id"
+```
+
+### Schema Usage in Roundtrip
+
+```mermaid
+sequenceDiagram
+    participant XML as Original XML
+    participant Parser
+    participant DataTable as Data Table
+    participant MetaTable as Metadata Table
+    participant Parquet
+    participant Serializer
+    participant Output as Output XML
+
+    XML->>Parser: Parse file
+    Parser->>DataTable: Extract text data<br/>(ALTO_SCHEMA)
+    Parser->>MetaTable: Extract metadata<br/>(METADATA_SCHEMA)
+    DataTable->>Parquet: Write data
+    MetaTable->>Parquet: Write metadata sidecar
+
+    Note over Parquet: Storage phase<br/>Can process millions of files
+
+    Parquet->>Serializer: Read data by source_file
+    Parquet->>Serializer: Read metadata
+    XML->>Serializer: Use as template
+    Serializer->>Output: Generate XML with<br/>preserved structure
 ```
 
 ## API Design
@@ -520,10 +636,67 @@ flowchart LR
 
 ## API Usage Examples
 
+### Basic Roundtrip Example
+
+```python
+# 1. Parse ALTO to PyArrow
+from meleon import parse, serialize, ALTOParser, ALTOSerializer
+from meleon.schemas import ALTO_SCHEMA
+
+parser = ALTOParser(ALTO_SCHEMA, level="word")
+table = parse("original.xml", parser)
+
+# 2. Process/transform the data
+import pyarrow.compute as pc
+filtered = table.filter(pc.field("confidence") > 0.9)
+
+# 3. Serialize back to ALTO using original as template
+serializer = ALTOSerializer(source_xml="original.xml")
+xml_output = serialize(filtered, serializer)
+
+# xml_output preserves all original metadata and structure
+```
+
+### Batch Processing with Reconstruction
+
+```python
+# 1. Batch process many files to Parquet
+from meleon import batch_process, ALTOParser
+from meleon.schemas import ALTO_SCHEMA
+import glob
+
+files = glob.glob("xmls/*.xml")
+parser = ALTOParser(ALTO_SCHEMA, level="word")
+
+batch_process(
+    files,
+    parser,
+    output_path="combined.parquet",
+    streaming=True
+)
+
+# 2. Later: Reconstruct specific file from Parquet
+import pyarrow.parquet as pq
+import pyarrow.compute as pc
+from meleon import serialize, ALTOSerializer
+
+# Load and filter by source file
+table = pq.read_table("combined.parquet")
+file_data = table.filter(
+    pc.field("source_file") == "xmls/document_001.xml"
+)
+
+# Serialize using original as template
+serializer = ALTOSerializer(source_xml="xmls/document_001.xml")
+reconstructed_xml = serialize(file_data, serializer)
+```
+
+### Metadata Preservation Example
+
 ```python
 # 1. Simple parsing
 from meleon import parse, ALTOParser
-from meleon.schemas import ALTO_SCHEMA
+from meleon.schemas import ALTO_SCHEMA, metadata_schema
 
 parser = ALTOParser(ALTO_SCHEMA, level="word")
 table = parse("document.xml", parser)
@@ -607,8 +780,28 @@ class ProcessingConfig:
 7. **Zero-Copy Operations**: Leverage PyArrow's efficient memory handling
 
 
+## Roundtrip Capabilities Summary
+
+### Supported Workflows
+
+1. **Single File Roundtrip**
+   - XML → PyArrow → Transform → XML (preserves structure)
+
+2. **Batch Processing with Individual Reconstruction**
+   - 1000s of XMLs → Single Parquet → Query by source_file → Individual XMLs
+
+3. **Metadata Preservation**
+   - All non-text elements preserved in metadata table
+   - Linked to data via page_id
+   - Used during serialization to reconstruct original structure
+
+4. **Template-Based Serialization**
+   - Original XML serves as template
+   - Data is injected into template preserving all formatting
+   - Ensures perfect roundtrip fidelity
+
 ### Current Limitations
-- Template required for XML serialization (cannot generate from scratch)
+- Template required for XML serialization (by design - ensures structure preservation)
 - Limited to ALTO and PageXML formats
 - No XSD schema validation
 - Basic error reporting in batch mode
