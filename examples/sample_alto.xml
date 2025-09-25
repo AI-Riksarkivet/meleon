@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alto xmlns="http://www.loc.gov/standards/alto/ns-v4#">
+  <Layout>
+    <Page ID="page001" WIDTH="2480" HEIGHT="3508">
+      <PrintSpace>
+        <TextBlock ID="block001">
+          <TextLine ID="line001">
+            <String ID="word001" CONTENT="Hello" HPOS="100" VPOS="200" WIDTH="50" HEIGHT="20" WC="0.95"/>
+            <String ID="word002" CONTENT="World" HPOS="160" VPOS="200" WIDTH="50" HEIGHT="20" WC="0.98"/>
+          </TextLine>
+          <TextLine ID="line002">
+            <String ID="word003" CONTENT="Test" HPOS="100" VPOS="230" WIDTH="40" HEIGHT="20" WC="0.92"/>
+            <String ID="word004" CONTENT="Document" HPOS="150" VPOS="230" WIDTH="80" HEIGHT="20" WC="0.96"/>
+          </TextLine>
+        </TextBlock>
+      </PrintSpace>
+    </Page>
+  </Layout>
+</alto>

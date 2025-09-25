@@ -1,48 +1,42 @@
-# XML Parser Architecture & Technical Design
+# Meleon Architecture & Technical Design
 
 ## Overview
 
-The XML Parser is a high-performance, schema-driven system for parsing ALTO and PageXML formats into PyArrow tables, optimized for large-scale batch processing with minimal memory footprint. It provides bidirectional XML processing (parsing and serialization) with cross-library compatibility through Narwhals integration.
+Meleon is a schema-driven system for parsing ALTO and PageXML formats into PyArrow tables, optimized for batch processing with configurable memory usage. It provides bidirectional XML processing (parsing and serialization) with cross-library compatibility through Narwhals integration.
 
 ## System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                          INPUT LAYER                            │
-├─────────────────────────┬───────────────────────────────────────┤
-│   XML Files             │        PyArrow Schema                 │
-│   • ALTO                │        • Field definitions            │
-│   • PageXML             │        • Data types                  │
-│   • Auto-detection      │        • Metadata preservation       │
-└────────────┬────────────┴──────────────┬────────────────────────┘
-             │                           │
-             ▼                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      CORE PROCESSING                            │
-├─────────────────────────────────────────────────────────────────┤
-│   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    │
-│   │ Format       │───▶│  Main API    │───▶│   Batch      │    │
-│   │ Parsers      │    │  (main.py)   │    │  Processor   │    │
-│   │ •ALTOParser  │    │              │    │  (batch.py)  │    │
-│   │ •PageXMLParser    │  •parse()    │    │              │    │
-│   └──────────────┘    │  •serialize()│    └──────────────┘    │
-│                       └──────────────┘                         │
-│   ┌──────────────┐    ┌──────────────┐                        │
-│   │ Serializers  │    │  Converters  │                        │
-│   │ •ALTOSerial. │    │ •Narwhals    │                        │
-│   │ •PageXMLSer. │    │  Adapter     │                        │
-│   └──────────────┘    └──────────────┘                        │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        OUTPUT LAYER                             │
-├──────────────────┬────────────────────┬────────────────────────┤
-│  PyArrow Table   │   Parquet Files    │   RecordBatch Stream   │
-│  (In-Memory)     │   (Disk Storage)   │   (Streaming)          │
-│                  │   •Single File     │                        │
-│                  │   •Partitioned DS  │                        │
-└──────────────────┴────────────────────┴────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Input["Input Layer"]
+        XML["XML Files<br/>• ALTO<br/>• PageXML<br/>• Auto-detection"]
+        Schema["PyArrow Schema<br/>• Field definitions<br/>• Data types<br/>• Metadata preservation"]
+    end
+
+    subgraph Core["Core Processing"]
+        Parsers["Format Parsers<br/>• ALTOParser<br/>• PageXMLParser"]
+        MainAPI["Main API<br/>• parse()<br/>• serialize()"]
+        Batch["Batch Processor"]
+        Serializers["Serializers<br/>• ALTOSerializer<br/>• PageXMLSerializer"]
+        Converters["Converters<br/>• Narwhals Adapter"]
+    end
+
+    subgraph Output["Output Layer"]
+        Table["PyArrow Table<br/>(In-Memory)"]
+        Parquet["Parquet Files<br/>• Single File<br/>• Partitioned Dataset"]
+        Stream["RecordBatch Stream<br/>(Streaming)"]
+    end
+
+    XML --> Parsers
+    Schema --> Parsers
+    Parsers --> MainAPI
+    MainAPI --> Batch
+    MainAPI --> Serializers
+    Batch --> Converters
+
+    Core --> Table
+    Core --> Parquet
+    Core --> Stream
 ```
 
 ## Module Organization
@@ -74,205 +68,280 @@ src/meleon/
 
 ## Component Architecture
 
-```
-Parser Components                   Serializer Components
-┌─────────────────┐                ┌─────────────────┐
-│   BaseParser    │                │ BaseSerializer  │
-│   (Abstract)    │                │   (Abstract)    │
-│ •detect_format()│                │ •serialize()    │
-│ •parse()        │                │ (template-based)│
-└────────┬────────┘                └────────┬────────┘
-         │                                  │
-    ┌────┴────┐                        ┌───┴───┐
-    │         │                        │       │
-┌───▼──┐  ┌──▼────┐              ┌────▼──┐ ┌─▼──────┐
-│ ALTO │  │PageXML│              │ ALTO  │ │PageXML │
-│Parser│  │Parser │              │Serial.│ │Serial. │
-└──────┘  └───────┘              └───────┘ └────────┘
+### Parser and Serializer Hierarchy
 
-Batch Processing Components         Data Converters
-┌────────────────────────┐         ┌────────────────────┐
-│    BatchProcessor      │         │  NarwhalsAdapter   │
-│ •to_reader()          │         │ •to_narwhals()     │
-│ •to_table()           │         │ •from_narwhals()   │
-│ •to_parquet()         │         │ •transform()       │
-│ •to_dataset()         │         └────────────────────┘
-│ •process_batches()    │
-└────────────────────────┘
+```mermaid
+classDiagram
+    class BaseParser {
+        <<abstract>>
+        +schema: pa.Schema
+        +level: str
+        +detect_format() str
+        +parse(file) pa.Table
+        +_extract_elements()*
+    }
+
+    class ALTOParser {
+        +parse(file) pa.Table
+        +_extract_elements()
+    }
+
+    class PageXMLParser {
+        +parse(file) pa.Table
+        +_extract_elements()
+    }
+
+    class BaseSerializer {
+        <<abstract>>
+        +template_path: str
+        +level: str
+        +serialize(table, template) str
+        +_update_elements()*
+    }
+
+    class ALTOSerializer {
+        +serialize(table) str
+        +_update_elements()
+    }
+
+    class PageXMLSerializer {
+        +serialize(table) str
+        +_update_elements()
+    }
+
+    BaseParser <|-- ALTOParser
+    BaseParser <|-- PageXMLParser
+    BaseSerializer <|-- ALTOSerializer
+    BaseSerializer <|-- PageXMLSerializer
+```
+
+### Processing Components
+
+```mermaid
+classDiagram
+    class StreamingBatchProcessor {
+        +files: List[Path]
+        +parser: BaseParser
+        +config: BatchProcessorConfig
+        +stream_to_parquet() int
+        +parallel_process() Iterator
+        +to_lazy_dataset() Dataset
+    }
+
+    class HybridProcessor {
+        +process() Iterator
+    }
+
+    class AdaptiveProcessor {
+        +_adjust_batch_size()
+        +_monitor_memory()
+    }
+
+    class NarwhalsAdapter {
+        +to_narwhals() DataFrame
+        +from_narwhals() pa.Table
+        +transform() pa.Table
+    }
+
+    StreamingBatchProcessor <|-- HybridProcessor
+    HybridProcessor <|-- AdaptiveProcessor
 ```
 
 ## Data Flow Architecture
 
+### Single File Processing
+
+```mermaid
+flowchart LR
+    XML[XML File] --> Parser
+    Parser --> Table[PyArrow Table]
+    Table --> Narwhals[Optional: Narwhals]
+    Narwhals --> Serializer
+    Table --> Serializer
+    Serializer --> OutputXML[XML Output]
+
+    Table -.-> Track[Auto-tracks source_file]
 ```
-Single File Processing:
-───────────────────────────────────────────────────────────
-XML File ──▶ Parser ──▶ PyArrow Table ──▶ [Optional: Narwhals] ──▶ Serializer ──▶ XML
-                           │
-                           └─ Auto-tracks source_file
 
-Batch Processing (Memory-Efficient):
-───────────────────────────────────────────────────────────
-                    ┌─────────────────────┐
-File List ──▶ Iterator ──▶ Accumulate ──▶│ 10K rows? │──▶ Yield Batch
-    ▲                         │          └─────────────┘        │
-    │                         │                                 ▼
-    │                         └──── No ◀────────────────  Stream/Table/
-    │                                                       Parquet
-    └──────────── Next File ◀──────────────────────────────────┘
+### Batch Processing Flow
 
-Cross-Library Processing:
-───────────────────────────────────────────────────────────
-PyArrow Table ──▶ Narwhals ──▶ [Polars/Pandas/PyArrow] ──▶ Transform ──▶ PyArrow Table
+```mermaid
+flowchart TD
+    Files[File List] --> Iterator
+    Iterator --> Accumulate
+    Accumulate --> Check{10K rows?}
+    Check -->|Yes| Yield[Yield Batch]
+    Check -->|No| Next[Next File]
+    Next --> Iterator
+    Yield --> Output[Stream/Table/Parquet]
+    Output --> Next
+```
+
+### Cross-Library Processing
+
+```mermaid
+flowchart LR
+    Table[PyArrow Table] --> Narwhals
+    Narwhals --> Libraries[Polars/Pandas/PyArrow]
+    Libraries --> Transform
+    Transform --> Result[PyArrow Table]
 ```
 
 ## Memory Management Strategy
 
-```
-┌──────────────────────────────────────────────────────────┐
-│              MEMORY-EFFICIENT PROCESSING                  │
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│  1M XML Files                          Memory Usage       │
-│       │                                    < 1GB          │
-│       ▼                                      ▲            │
-│  ┌──────────┐                               │            │
-│  │Generator │ ◀─────────────┐               │            │
-│  │  (Lazy)  │              │                │            │
-│  └─────┬────┘              │                │            │
-│        │                   │                │            │
-│        ▼                   │                │            │
-│  ┌───────────┐             │          ┌─────┴────┐       │
-│  │   10K     │─── Process ─┴───────▶  │  Fixed   │       │
-│  │   Rows    │                        │  Buffer  │       │
-│  │   Batch   │                        └──────────┘       │
-│  └─────┬─────┘                                           │
-│        │                                                  │
-│        ▼                                                  │
-│  ┌────────────┐                                          │
-│  │ Incremental│ (Stream write to Parquet)                │
-│  │   Write    │ (No accumulation in memory)              │
-│  └────────────┘                                          │
-│                                                           │
-└───────────────────────────────────────────────────────────┘
+### Memory-Efficient Processing
 
-Parallel Processing Architecture:
-┌──────────────────────────────────────────────────────────┐
-│              PARALLEL FILE PROCESSING                     │
-├────────────────────────────────────────────────────────────┤
-│                                                           │
-│  File Chunks ──▶ ThreadPoolExecutor                      │
-│      │               │                                    │
-│  [F1-F1000] ────▶ Worker 1 ──▶ Parse ──▶ Table          │
-│  [F1001-F2000] ─▶ Worker 2 ──▶ Parse ──▶ Table          │
-│  [F2001-F3000] ─▶ Worker 3 ──▶ Parse ──▶ Table          │
-│      ...            ...         ...       │              │
-│                                           ▼              │
-│                                    Stream Write          │
-│                                    (Incremental)         │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Files[1M XML Files] --> Generator[Generator<br/>Lazy Loading]
+    Generator --> Batch[10K Row Batch]
+    Batch --> Process
+    Process --> Buffer[Fixed Buffer<br/>< 1GB Memory]
+    Buffer --> Write[Incremental Write<br/>to Parquet]
+    Write --> Next[Next Batch]
+    Next --> Generator
+```
+
+### Parallel Processing Architecture
+
+```mermaid
+flowchart TD
+    Chunks[File Chunks] --> Executor[ThreadPoolExecutor]
+
+    Executor --> W1[Worker 1<br/>Files 1-1000]
+    Executor --> W2[Worker 2<br/>Files 1001-2000]
+    Executor --> W3[Worker 3<br/>Files 2001-3000]
+
+    W1 --> P1[Parse] --> T1[Table]
+    W2 --> P2[Parse] --> T2[Table]
+    W3 --> P3[Parse] --> T3[Table]
+
+    T1 --> Stream[Stream Write<br/>Incremental]
+    T2 --> Stream
+    T3 --> Stream
 ```
 
 ## Class Hierarchy & Responsibilities
 
-```
-                    BaseParser (Abstract)
-                         │
-                         ├─ Attributes:
-                         │   • schema (PyArrow)
-                         │   • level (word/line/region)
-                         │
-                         ├─ Methods:
-                         │   • detect_format() → str
-                         │   • parse(file) → pa.Table
-                         │   • _extract_elements() (abstract)
-                         │
-            ┌────────────┴────────────┐
-            │                         │
-      ALTOParser                PageXMLParser
-            │                         │
-      Implements:              Implements:
-      • ALTO XML parsing       • PageXML parsing
-      • HPOS/VPOS/WIDTH/HEIGHT • Coordinate points
-      • Style references       • Baseline extraction
-      • Namespace handling     • Bounding box calc
+```mermaid
+classDiagram
+    class BaseParser {
+        <<abstract>>
+        +schema: pa.Schema
+        +level: str
+        +detect_format() str
+        +parse(file) pa.Table
+        #_extract_elements()*
+    }
 
+    class ALTOParser {
+        -_extract_alto_elements()
+        -_parse_styles()
+        -_extract_text_blocks()
+        HPOS/VPOS/WIDTH/HEIGHT
+        Style references
+        Namespace handling
+    }
 
-                    BaseSerializer (Abstract)
-                         │
-                         ├─ Attributes:
-                         │   • template_path
-                         │   • level
-                         │
-                         ├─ Methods:
-                         │   • serialize(table, template) → str
-                         │   • _update_elements() (abstract)
-                         │
-            ┌────────────┴────────────┐
-            │                         │
-      ALTOSerializer           PageXMLSerializer
-            │                         │
-      Template-based:          Template-based:
-      • Updates existing XML   • Updates existing XML
-      • Preserves metadata     • Preserves structure
-      • ID-based matching      • ID-based matching
+    class PageXMLParser {
+        -_extract_pagexml_elements()
+        -_parse_coords()
+        -_calculate_bbox()
+        Coordinate points
+        Baseline extraction
+        Bounding box calc
+    }
 
+    class BaseSerializer {
+        <<abstract>>
+        +template_path: str
+        +level: str
+        +serialize(table, template) str
+        #_update_elements()*
+    }
 
-                    BatchProcessor
-                         │
-                         ├─ Attributes:
-                         │   • file_paths: List[Path]
-                         │   • schema: pa.Schema
-                         │   • level: str
-                         │
-                         ├─ Methods:
-                         │   • to_reader(batch_size) → RecordBatchReader
-                         │   • to_table() → pa.Table
-                         │   • to_parquet(path, compression)
-                         │   • to_dataset(path, partitioning)
-                         │   • process_batches() → Iterator[pa.RecordBatch]
+    class ALTOSerializer {
+        -_update_alto_elements()
+        Updates existing XML
+        Preserves metadata
+        ID-based matching
+    }
+
+    class PageXMLSerializer {
+        -_update_pagexml_elements()
+        Updates existing XML
+        Preserves structure
+        ID-based matching
+    }
+
+    class StreamingBatchProcessor {
+        +file_paths: List~Path~
+        +parser: BaseParser
+        +config: BatchProcessorConfig
+        +stream_to_parquet() int
+        +parallel_process() Iterator
+        +to_lazy_dataset() Dataset
+        +process_with_memory_limit() Iterator
+    }
+
+    BaseParser <|-- ALTOParser
+    BaseParser <|-- PageXMLParser
+    BaseSerializer <|-- ALTOSerializer
+    BaseSerializer <|-- PageXMLSerializer
 ```
 
 ## Schema Definitions
 
-```
-┌────────────────────────────────────────────────────────────┐
-│                     ALTO Schema                           │
-├────────────────────────────────────────────────────────────┤
-│  Hierarchical IDs:          │  Geometry & Attributes:     │
-│  • page_id      : string    │  • x       : int32         │
-│  • region_id    : string    │  • y       : int32         │
-│  • line_id      : string    │  • width   : int32         │
-│  • word_id      : string    │  • height  : int32         │
-│  • text         : string    │  • confidence : float32    │
-│                             │  • style_refs : string     │
-└────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌────────────────────────────────────────────────────────────┐
-│                    PageXML Schema                         │
-├────────────────────────────────────────────────────────────┤
-│  Hierarchical IDs:          │  Coordinates:              │
-│  • page_id      : string    │  • coords   : string       │
-│  • region_id    : string    │  • baseline : string       │
-│  • line_id      : string    │  • x, y, width, height    │
-│  • word_id      : string    │  • confidence : float32    │
-│  • text         : string    │  • region_type : string    │
-└────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌────────────────────────────────────────────────────────────┐
-│                  Metadata Schema                          │
-├────────────────────────────────────────────────────────────┤
-│  Document Metadata:                                       │
-│  • xml_declaration : struct<version, encoding, standalone>│
-│  • namespaces     : list<struct<prefix, uri>>           │
-│  • metadata       : string (JSON)                        │
-│  • custom_elements: list<struct<name, attrs, text>>      │
-│                                                           │
-│  Processing Info (Auto-Added):                           │
-│  • source_file    : string                               │
-│  • processing_time: timestamp                            │
-└────────────────────────────────────────────────────────────┘
+### PyArrow Schema Structure
+
+```mermaid
+erDiagram
+    ALTO_SCHEMA {
+        string page_id
+        string region_id
+        string line_id
+        string word_id
+        string text
+        int32 x
+        int32 y
+        int32 width
+        int32 height
+        float32 confidence
+        string style_refs
+    }
+
+    PAGEXML_SCHEMA {
+        string page_id
+        string region_id
+        string line_id
+        string word_id
+        string text
+        string coords
+        string baseline
+        float32 confidence
+    }
+
+    METADATA_SCHEMA {
+        string page_id
+        string format_type
+        string format_version
+        string xml_declaration
+        string namespaces
+        string schema_location
+        int32 page_width
+        int32 page_height
+        string page_filename
+        string page_attributes
+        string reading_order
+        string alto_measurement_unit
+        string alto_processing_info
+        string pagexml_creator
+        string pagexml_created
+        string pagexml_last_change
+        string custom_elements
+        bool original_schema_valid
+        string validation_errors
+    }
 ```
 
 ## API Design
@@ -351,275 +420,201 @@ def from_narwhals(df: nw.DataFrame) -> pa.Table
 def transform(table: pa.Table, func: Callable) -> pa.Table
 ```
 
-## Performance Characteristics
+## Processing Modes
 
-```
-┌────────────────────┬──────────────┬─────────────────┐
-│    Operation       │ Memory Usage │   Throughput    │
-├────────────────────┼──────────────┼─────────────────┤
-│ Stream 1M files    │    < 1GB     │  ~10K files/min │
-│ Parallel Process   │  O(workers)  │  ~50K files/min │
-│ Parse to Table     │     O(n)     │  ~50K rows/sec  │
-│ Stream to Parquet  │  O(batch)    │  ~100K rows/sec │
-│ Incremental Write  │  O(1)        │  ~200K rows/sec │
-│ Read Parquet       │  O(batch)    │  ~500K rows/sec │
-│ Dataset Filter     │     O(1)     │     Instant     │
-│ Narwhals Transform │   O(batch)   │  Library-dependent│
-└────────────────────┴──────────────┴─────────────────┘
+### Streaming Mode
+- Memory usage: O(batch_size)
+- Use case: Large file collections
+- Incremental writing to Parquet
 
-Processing Modes:
-─────────────────────────────────────────────────────
-         Mode              Memory         Use Case
-─────────────────────────────────────────────────────
-    ┌──────────┐
-    │Streaming │          O(1)         Millions of files
-    │(Iterator)│                       Real-time processing
-    └──────────┘
+### Parallel Mode
+- Memory usage: O(workers * batch_size)
+- Use case: Medium datasets with CPU resources
+- ThreadPoolExecutor-based processing
 
-    ┌──────────┐
-    │  Batch   │        O(batch)       Medium datasets
-    │(10K rows)│                       Controlled memory
-    └──────────┘
+### Hybrid Mode
+- Combines parallel and streaming
+- Adapts batch size to available memory
 
-    ┌──────────┐
-    │  Table   │          O(n)         Small datasets
-    │(In-memory)│                      Fast access
-    └──────────┘
-
-    ┌──────────┐
-    │ Dataset  │        O(1)          Partitioned data
-    │(Lazy eval)│                      Query optimization
-    └──────────┘
-```
+### Adaptive Mode
+- Automatically adjusts to system resources
+- Monitors memory usage and adjusts batch sizes
 
 
 ## Key Design Decisions
 
-```
-┌──────────────────────┬────────────────────────────────────┐
-│     Decision         │           Rationale                │
-├──────────────────────┼────────────────────────────────────┤
-│ PyArrow as core      │ • Native Parquet support           │
-│ data structure       │ • Zero-copy operations             │
-│                      │ • C++ performance                  │
-├──────────────────────┼────────────────────────────────────┤
-│ Schema-driven        │ • Type safety                      │
-│ extraction           │ • Selective field extraction       │
-│                      │ • Predictable output               │
-├──────────────────────┼────────────────────────────────────┤
-│ Template-based       │ • Preserves document metadata      │
-│ serialization        │ • Maintains XML structure          │
-│                      │ • Simpler implementation           │
-├──────────────────────┼────────────────────────────────────┤
-│ Narwhals            │ • Cross-library compatibility      │
-│ integration          │ • User choice of dataframe lib    │
-│                      │ • Future-proof design              │
-├──────────────────────┼────────────────────────────────────┤
-│ Batch by rows,       │ • Consistent memory usage          │
-│ not files           │ • Handles varying file sizes       │
-│                      │ • Predictable performance          │
-├──────────────────────┼────────────────────────────────────┤
-│ 10K row default      │ • Balance memory vs I/O            │
-│ batch size          │ • Optimized for typical workloads  │
-│                      │ • User configurable                │
-├──────────────────────┼────────────────────────────────────┤
-│ Dependency          │ • Clear separation of concerns     │
-│ injection           │ • Testable components              │
-│                      │ • Flexible configuration           │
-└──────────────────────┴────────────────────────────────────┘
-```
+| Decision | Rationale |
+|----------|----------|
+| **PyArrow as core data structure** | • Native Parquet support<br/>• Zero-copy operations<br/>• C++ performance |
+| **Schema-driven extraction** | • Type safety<br/>• Selective field extraction<br/>• Predictable output |
+| **Template-based serialization** | • Preserves document metadata<br/>• Maintains XML structure<br/>• Simpler implementation |
+| **Narwhals integration** | • Cross-library compatibility<br/>• User choice of dataframe lib<br/>• Future-proof design |
+| **Batch by rows, not files** | • Consistent memory usage<br/>• Handles varying file sizes<br/>• Predictable performance |
+| **10K row default batch size** | • Balance memory vs I/O<br/>• Optimized for typical workloads<br/>• User configurable |
+| **Dependency injection** | • Clear separation of concerns<br/>• Testable components<br/>• Flexible configuration |
 
 ## Error Handling Strategy
 
-```
-                   ┌─────────┐
-    XML File ──▶   │  Parse  │
-                   └────┬────┘
-                        │
-                   ┌────▼────┐
-                   │Validate │ (Format detection)
-                   └────┬────┘
-                        │
-           ┌────────────┼────────────┐
-           ▼                         ▼
-       ┌───────┐                ┌────────┐
-       │  Valid│                │ Invalid│
-       └───┬───┘                └────┬───┘
-           │                         │
-           ▼                         ▼
-     ┌──────────┐             ┌──────────┐
-     │Extract   │             │Log Error │
-     │Elements  │             │Return    │
-     └─────┬────┘             │Empty     │
-           │                  └─────┬────┘
-           ▼                         │
-     ┌──────────┐                    │
-     │Create    │                    │
-     │PyArrow   │                    │
-     │Table     │                    │
-     └─────┬────┘                    │
-           │                         │
-           └──────────┬──────────────┘
-                      ▼
-                ┌──────────┐
-                │ Continue │──▶ Next File
-                │Processing│
-                └──────────┘
+```mermaid
+flowchart TD
+    File[XML File] --> Parse
+    Parse --> Validate[Validate<br/>Format detection]
+    Validate --> Valid{Valid?}
 
-Batch Processing Error Resilience:
-─────────────────────────────────────
-• Individual file failures don't stop batch
-• Failed files logged with details
-• Empty batches handled gracefully
-• Partial results preserved
+    Valid -->|Yes| Extract[Extract Elements]
+    Valid -->|No| LogError[Log Error]
+
+    Extract --> CreateTable[Create PyArrow Table]
+    LogError --> ReturnEmpty[Return Empty]
+
+    CreateTable --> Continue[Continue Processing]
+    ReturnEmpty --> Continue
+    Continue --> NextFile[Next File]
 ```
+
+### Batch Processing Error Resilience
+
+- Individual file failures don't stop batch processing
+- Failed files are logged with detailed error messages
+- Empty batches are handled gracefully
+- Partial results are preserved and written
+- Configurable error thresholds and retry logic
 
 ## Scalability Architecture
 
+### Vertical Scaling
+
+```mermaid
+flowchart LR
+    PyArrow[PyArrow Threading] --> ParallelIO[Parallel I/O]
+    ParallelIO --> T1[Thread 1<br/>Parquet Write]
+    ParallelIO --> T2[Thread 2<br/>Compression]
+    ParallelIO --> TN[Thread N<br/>Column Encoding]
+
+    Memory[More Memory] --> Batches[Larger Batches]
+    Batches --> Throughput[Better Throughput]
 ```
-Vertical Scaling:
-─────────────────────────────────────────
-    PyArrow Threading ──▶ Parallel I/O
-                           │
-                      ┌────┴────┐
-                      │Thread 1 │ (Parquet write)
-                      │Thread 2 │ (Compression)
-                      │Thread N │ (Column encoding)
-                      └─────────┘
 
-    More Memory ──▶ Larger Batches ──▶ Better Throughput
+### Horizontal Scaling
 
+```mermaid
+flowchart TD
+    Dataset --> Partitioned[Partitioned Dataset<br/>by page_id]
+    Partitioned --> P1[Partition 1]
+    Partitioned --> P2[Partition 2]
+    Partitioned --> PN[Partition N]
 
-Horizontal Scaling (via Partitioned Datasets):
-─────────────────────────────────────────
-                 ┌──────────────┐
-    Dataset ──▶  │  Partitioned │
-                 │   by page_id  │
-                 └───────┬──────┘
-                         │
-            ┌────────────┼────────────┐
-            ▼            ▼            ▼
-        ┌──────┐    ┌──────┐    ┌──────┐
-        │Part 1│    │Part 2│    │Part N│
-        └──────┘    └──────┘    └──────┘
-         Process     Process     Process
-         Parallel    Parallel    Parallel
+    P1 --> Process1[Process Parallel]
+    P2 --> Process2[Process Parallel]
+    PN --> ProcessN[Process Parallel]
+```
 
+### Storage Optimization
 
-Storage Optimization:
-─────────────────────────────────────────
-    Partitioned ──▶ Fast Queries
-     Parquet        (Predicate Pushdown)
-                    (Column Projection)
-
-    Compression ──▶ Reduced Storage
-     (Snappy)       (~70% reduction)
-
-    Columnar ──▶ Efficient Analytics
-     Format      (Only read needed columns)
+```mermaid
+flowchart LR
+    Parquet[Partitioned Parquet] --> Fast[Fast Queries<br/>• Predicate Pushdown<br/>• Column Projection]
+    Compression[Compression<br/>Snappy] --> Storage[Reduced Storage]
+    Columnar[Columnar Format] --> Analytics[Efficient Analytics<br/>Only read needed columns]
 ```
 
 ## API Usage Examples
 
 ```python
-# 1. Simple parsing with auto-detection
-from xml_parser import parse_alto, parse_pagexml
-table = parse_alto("document.xml", level="word")
+# 1. Simple parsing
+from meleon import parse, ALTOParser
+from meleon.schemas import ALTO_SCHEMA
+
+parser = ALTOParser(ALTO_SCHEMA, level="word")
+table = parse("document.xml", parser)
 
 # 2. Batch processing with streaming
-from xml_parser import BatchProcessor, schemas
-processor = BatchProcessor(files, schemas.ALTO_SCHEMA, level="line")
-for batch in processor.to_reader(batch_size=5000):
-    process(batch)  # Process 5000 rows at a time
+from meleon import batch_process
 
-# 3. Cross-library processing with Narwhals
-from xml_parser.converters import NarwhalsAdapter
-adapter = NarwhalsAdapter()
-polars_df = adapter.to_narwhals(arrow_table)
-# Use Polars operations...
-result = adapter.from_narwhals(polars_df)
-
-# 4. Serialization with template
-from xml_parser import ALTOSerializer, serialize
-serializer = ALTOSerializer(template_path="original.xml")
-xml_output = serialize(modified_table, serializer)
-
-# 5. Partitioned dataset creation
-processor.to_dataset(
-    "output_dataset/",
-    partitioning=["page_id"],
-    max_rows_per_file=100000
+batch_process(
+    files,
+    parser,
+    output_path="output.parquet",
+    batch_size=10000,
+    streaming=True
 )
 
+# 3. Cross-library processing with Narwhals
+from meleon.converters.narwhals_adapter import NarwhalsAdapter
+
+adapter = NarwhalsAdapter()
+df = adapter.to_narwhals(arrow_table)
+# Transform with Polars/Pandas...
+result = adapter.from_narwhals(df)
+
+# 4. Serialization with template
+from meleon import serialize, ALTOSerializer
+
+serializer = ALTOSerializer(source_xml="original.xml")
+xml_output = serialize(modified_table, serializer)
+
+# 5. Streaming with memory limit
+from meleon import StreamingBatchProcessor, BatchProcessorConfig
+
+config = BatchProcessorConfig()
+config.processing.memory_limit_mb = 512
+
+processor = StreamingBatchProcessor(files, parser, config)
+processor.stream_to_parquet("output_dir/")
+
 # 6. Lazy dataset operations
-dataset = read_parquet_lazy("dataset/")
+import pyarrow.dataset as ds
+import pyarrow.compute as pc
+
+dataset = ds.dataset("output_dir/", format="parquet")
 scanner = dataset.scanner(
     columns=["text", "confidence"],
     filter=pc.field("confidence") > 0.9
 )
 for batch in scanner.to_batches():
-    # Only matching data is loaded
+    # Process filtered batches
+    pass
 ```
 
 
-### Extension Points
+## Configuration System
 
-```
-┌─────────────────────────────────────────────────────┐
-│              Extension Points                       │
-├─────────────────────────────────────────────────────┤
-│                                                     │
-│  New Formats:  BaseParser ◀─── METSParser          │
-│                BaseSerializer ◀─── TEISerializer    │
-│                                                     │
-│  Custom Schema: user_schema = pa.schema([          │
-│                    ("custom_field", pa.string()),  │
-│                    ("custom_score", pa.float32())  │
-│                ])                                  │
-│                                                     │
-│  Cloud Storage: dataset = ds.dataset(              │
-│                    "s3://bucket/path",             │
-│                    format="parquet"                │
-│                )                                   │
-│                                                     │
-│  Distributed:  ray.data.read_parquet(              │
-│                    processor.to_parquet()          │
-│                ).map_batches(transform)            │
-│                                                     │
-└─────────────────────────────────────────────────────┘
+```python
+class BatchProcessorConfig:
+    processing: ProcessingConfig
+    streaming: StreamingConfig
+    parquet: ParquetConfig
+    dataset: DatasetConfig
+
+class ProcessingConfig:
+    batch_file_size: int = 1000
+    batch_row_size: int = 10000
+    shard_size: int = 100000
+    max_workers: Optional[int] = None
+    memory_limit_mb: int = 1024
+    processing_mode: Literal["sequential", "parallel", "streaming", "hybrid"]
+    compression: str = "snappy"
 ```
 
-## Performance Optimization Techniques
+## Design Principles
 
-1. **Schema Projection**: Only extract required fields from XML
-2. **Batch Accumulation**: Process multiple small files per batch
-3. **Filter Pushdown**: Apply predicates at Parquet read time
-4. **Column Pruning**: Read only necessary columns from storage
-5. **Compression**: Use Snappy for fast compression/decompression
-6. **Partitioning**: Organize data by frequently filtered columns
-7. **Direct Construction**: Build PyArrow tables without intermediate Python objects
+1. **Schema-Driven**: PyArrow schemas define extraction structure
+2. **Dependency Injection**: Parsers and serializers are injected, not hardcoded
+3. **Generator-Based**: Use iterators for memory-efficient processing
+4. **Configurable Batching**: User-defined batch sizes and memory limits
+5. **Template Serialization**: Preserve original XML structure when serializing
+6. **Error Resilience**: Individual file failures don't stop batch processing
+7. **Zero-Copy Operations**: Leverage PyArrow's efficient memory handling
 
-
-## Current Limitations & Future Improvements
-
-### Implementation Features
-1. **Streaming Write**: Incremental Parquet writing without memory accumulation
-2. **Parallel Processing**: Concurrent file processing with ThreadPoolExecutor
-3. **Adaptive Processing**: Automatic adjustment to system resources
-4. **Configuration**: Comprehensive Pydantic-based configuration system
-5. **CLI**: Full-featured Typer CLI for all operations
-6. **Memory Efficient**: True streaming with configurable memory limits
 
 ### Current Limitations
-1. **Serialization**: Cannot generate XML from scratch (requires template)
-2. **Format Support**: Limited to ALTO and PageXML formats
-3. **Validation**: Basic format detection, no XSD schema validation
-4. **Error Granularity**: Limited per-element error reporting in batch mode
+- Template required for XML serialization (cannot generate from scratch)
+- Limited to ALTO and PageXML formats
+- No XSD schema validation
+- Basic error reporting in batch mode
 
-### Architectural Strengths
-1. **Clean Separation**: Well-defined module boundaries and responsibilities
-2. **Type Safety**: Schema-driven approach with PyArrow strong typing
-3. **Memory Efficiency**: Streaming architecture for unlimited scale
-4. **Extensibility**: Abstract base classes for new format support
-5. **Interoperability**: Narwhals integration for ecosystem compatibility
-6. **Performance**: Direct PyArrow operations avoid Python overhead
+### Extension Points
+- Add new format support by extending BaseParser/BaseSerializer
+- Custom schemas through PyArrow schema definitions
+- Cloud storage support via PyArrow dataset API
+- Custom processors by extending StreamingBatchProcessor

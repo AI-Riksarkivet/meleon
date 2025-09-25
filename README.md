@@ -1,56 +1,147 @@
-# 🦎 Meleon (WIP)
+# 🦎 Meleon
 
 <div align="center">
   <img src="assets/meleon.jpg" alt="Meleon Logo" width="250">
 </div>
 
+**Adaptive OCR data extraction library for ALTO and PageXML formats**
 
-*Transform OCR/HTR into lightning-fast data formats - Like a chameleon adapts, Meleon transforms*
+## Overview
 
----
+Meleon transforms OCR/HTR data from XML formats (ALTO, PageXML) into PyArrow tables and Parquet files. It provides streaming processing for large-scale document collections with configurable memory usage.
 
-## 🦎 **Why Meleon?** 🦎
+## Features
 
-**The Problem:** You have thousands (or millions) of OCR XML files (ALTO, PageXML) from digitization projects. They're huge, slow to parse, and hard to analyze at scale.
+- **Streaming Processing**: Process large collections with configurable batch sizes
+- **Bidirectional Conversion**: Parse XML to PyArrow and serialize back to XML
+- **Multiple Extraction Levels**: Extract at word, line, or region level
+- **Parallel Processing**: Multi-threaded batch processing
+- **Adaptive Processing**: Automatically adjusts to system resources
+- **Cross-Library Support**: Narwhals integration for Pandas/Polars compatibility
+- **CLI Interface**: Command-line tools for common operations
 
+## Installation
 
-## 🚀 **Key Features**
+```bash
+pip install meleon
 
-### ⚡ **Blazing Fast Performance**
-- Stream data without loading everything into memory
-- Parallel processing with PyArrow's native threading
-- Narwhals for data transformation
-- Serialize to preferred format
+# With CLI support
+pip install meleon[cli]
 
+# For development
+pip install meleon[dev]
+```
 
-### 🔄 **Bidirectional Conversion**
+## Usage
+
+### Python API
+
 ```python
-# XML → PyArrow
+import meleon
+from meleon import ALTOParser, PageXMLParser
+from meleon.schemas import ALTO_SCHEMA, PAGEXML_SCHEMA
+
+# Parse single file
+parser = ALTOParser(ALTO_SCHEMA, level="word")
 table = meleon.parse("document.xml", parser)
 
-data_transformation stuff... on table --> transformed_table
+# Batch process to Parquet
+from meleon import batch_process
 
-# PyArrow → XML
-xml_string = meleon.serialize(transformed_table, serializer)
+files = ["doc1.xml", "doc2.xml", "doc3.xml"]
+batch_process(
+    files,
+    parser,
+    output_path="output.parquet",
+    batch_size=10000,
+    streaming=True
+)
+
+# Serialize back to XML
+from meleon import ALTOSerializer
+
+serializer = ALTOSerializer(source_xml="original.xml")
+xml_output = meleon.serialize(table, serializer)
 ```
-## 🏗️ **Architecture**
 
-Meleon uses a clean, extensible architecture:
+### CLI
+
+```bash
+# Parse single file
+meleon parse document.xml --output data.parquet --format alto --level word
+
+# Batch process directory
+meleon batch ./xml_files/ ./output.parquet --pattern "*.xml" --workers 8
+
+# Stream process with memory limit
+meleon stream ./xml_files/ ./output_shards/ --memory-limit 512 --shard-size 100000
+
+# Transform with filters
+meleon transform input.parquet output.parquet --min-confidence 0.9
+
+# Show statistics
+meleon stats data.parquet
+```
+
+## Processing Modes
+
+### Streaming Mode
+```python
+from meleon import StreamingBatchProcessor, BatchProcessorConfig
+
+config = BatchProcessorConfig()
+config.processing.memory_limit_mb = 512
+config.processing.shard_size = 100000
+
+processor = StreamingBatchProcessor(files, parser, config)
+processor.stream_to_parquet("output_dir/")
+```
+
+### Parallel Mode
+```python
+config.processing.processing_mode = "parallel"
+config.processing.max_workers = 8
+processor = StreamingBatchProcessor(files, parser, config)
+```
+
+### Adaptive Mode
+```python
+from meleon import AdaptiveProcessor
+
+processor = AdaptiveProcessor(files, parser)
+processor.stream_to_parquet("output.parquet")
+```
+
+## Data Schemas
+
+### ALTO Schema
+- `page_id`, `region_id`, `line_id`, `word_id`: Hierarchical identifiers
+- `text`: Extracted text content
+- `x`, `y`, `width`, `height`: Bounding box coordinates
+- `confidence`: OCR confidence score
+- `style_refs`: Style references
+
+### PageXML Schema
+- `page_id`, `region_id`, `line_id`, `word_id`: Hierarchical identifiers
+- `text`: Extracted text content
+- `coords`: Polygon coordinates
+- `baseline`: Text baseline
+- `confidence`: OCR confidence score
+
+## Architecture
 
 ```
-Input Layer (XML Files)
+XML Files (ALTO/PageXML)
     ↓
-Parser Layer (ALTO/PageXML → PyArrow)
+Parsers (Schema-driven extraction)
     ↓
-Processing Layer (Batch/Stream/Transform)
+Processing (Stream/Batch/Parallel)
     ↓
-Output Layer (Parquet/Dataset/Stream)
+Output (PyArrow Table/Parquet/Dataset)
 ```
-
-- **Dependency Injection**: Configure once, use everywhere
-- **Schema-Driven**: Type-safe, predictable outputs
-- **Generator-Based**: Process unlimited data with fixed memory
-- **Zero-Copy**: Leverage PyArrow's efficient memory handling
-
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed technical design.
+
+## License
+
+Apache License 2.0
