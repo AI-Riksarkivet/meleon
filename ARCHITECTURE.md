@@ -392,55 +392,6 @@ Processing Modes:
     └──────────┘
 ```
 
-## Technical Design Patterns
-
-### 1. Dependency Injection Pattern
-```python
-# Parser configured once, used multiple times
-parser = ALTOParser(schema=ALTO_SCHEMA, level="word")
-for file in files:
-    table = parse(file, parser)
-```
-
-### 2. Generator Pattern
-```python
-# Memory-efficient streaming
-def parse_batch_iterator():
-    for file in files:
-        batch = parse(file)
-        if accumulated >= batch_size:
-            yield batch  # Memory released after yield
-```
-
-### 3. Template Method Pattern
-```python
-# Base class defines algorithm, subclasses implement steps
-class BaseParser:
-    def parse(self, file):
-        root = self._parse_xml(file)
-        elements = self._extract_elements(root)  # Abstract
-        return self._create_table(elements)
-```
-
-### 4. Adapter Pattern
-```python
-# Narwhals adapter for cross-library compatibility
-def transform_with_polars(arrow_table):
-    nw_df = to_narwhals(arrow_table)
-    # Use Polars/Pandas/PyArrow transparently
-    result = nw_df.filter(nw.col("confidence") > 0.9)
-    return from_narwhals(result)
-```
-
-### 5. Factory Pattern
-```python
-# Auto-detect and create appropriate parser
-def detect_format(file_path) -> BaseParser:
-    if "alto" in str(file_path).lower():
-        return ALTOParser(schema, level)
-    elif "page" in str(file_path).lower():
-        return PageXMLParser(schema, level)
-```
 
 ## Key Design Decisions
 
@@ -610,29 +561,6 @@ for batch in scanner.to_batches():
     # Only matching data is loaded
 ```
 
-## Current Limitations & Future Improvements
-
-### Implementation Features
-1. **Streaming Write**: Incremental Parquet writing without memory accumulation
-2. **Parallel Processing**: Concurrent file processing with ThreadPoolExecutor
-3. **Adaptive Processing**: Automatic adjustment to system resources
-4. **Configuration**: Comprehensive Pydantic-based configuration system
-5. **CLI**: Full-featured Typer CLI for all operations
-6. **Memory Efficient**: True streaming with configurable memory limits
-
-### Current Limitations
-1. **Serialization**: Cannot generate XML from scratch (requires template)
-2. **Format Support**: Limited to ALTO and PageXML formats
-3. **Validation**: Basic format detection, no XSD schema validation
-4. **Error Granularity**: Limited per-element error reporting in batch mode
-
-### Architectural Strengths
-1. **Clean Separation**: Well-defined module boundaries and responsibilities
-2. **Type Safety**: Schema-driven approach with PyArrow strong typing
-3. **Memory Efficiency**: Streaming architecture for unlimited scale
-4. **Extensibility**: Abstract base classes for new format support
-5. **Interoperability**: Narwhals integration for ecosystem compatibility
-6. **Performance**: Direct PyArrow operations avoid Python overhead
 
 ### Extension Points
 
@@ -670,3 +598,28 @@ for batch in scanner.to_batches():
 5. **Compression**: Use Snappy for fast compression/decompression
 6. **Partitioning**: Organize data by frequently filtered columns
 7. **Direct Construction**: Build PyArrow tables without intermediate Python objects
+
+
+## Current Limitations & Future Improvements
+
+### Implementation Features
+1. **Streaming Write**: Incremental Parquet writing without memory accumulation
+2. **Parallel Processing**: Concurrent file processing with ThreadPoolExecutor
+3. **Adaptive Processing**: Automatic adjustment to system resources
+4. **Configuration**: Comprehensive Pydantic-based configuration system
+5. **CLI**: Full-featured Typer CLI for all operations
+6. **Memory Efficient**: True streaming with configurable memory limits
+
+### Current Limitations
+1. **Serialization**: Cannot generate XML from scratch (requires template)
+2. **Format Support**: Limited to ALTO and PageXML formats
+3. **Validation**: Basic format detection, no XSD schema validation
+4. **Error Granularity**: Limited per-element error reporting in batch mode
+
+### Architectural Strengths
+1. **Clean Separation**: Well-defined module boundaries and responsibilities
+2. **Type Safety**: Schema-driven approach with PyArrow strong typing
+3. **Memory Efficiency**: Streaming architecture for unlimited scale
+4. **Extensibility**: Abstract base classes for new format support
+5. **Interoperability**: Narwhals integration for ecosystem compatibility
+6. **Performance**: Direct PyArrow operations avoid Python overhead
