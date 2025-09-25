@@ -204,7 +204,7 @@ flowchart LR
     end
 
     subgraph Processing["Processing"]
-        MetaSchema[metadata_schema()<br/>Preserves ALL metadata]
+        MetaSchema[metadata_schema&#40;&#41;<br/>Preserves ALL metadata]
         DataSchema[ALTO/PageXML Schema<br/>Structured extraction]
     end
 
