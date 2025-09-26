@@ -1,7 +1,7 @@
 # 🦎 Meleon
 
 <div align="center">
-  <img src="assets/meleon.jpg" alt="Meleon Logo" width="250">
+  <img width="300" alt="melo2" src="https://github.com/user-attachments/assets/43ad718d-4507-4575-96b7-cb28c2b2dab0" />
 </div>
 
 **Adaptive OCR data extraction library for ALTO and PageXML formats**
