@@ -235,18 +235,18 @@ flowchart TB
 flowchart LR
     subgraph Input["XML Input"]
         OrigXML[Original XML]
-        Meta[Metadata Elements<br/>• Description<br/>• Processing Software<br/>• Styles<br/>• Layout]
-        Data[Data Elements<br/>• TextBlocks<br/>• TextLines<br/>• Words]
+        Meta["Metadata Elements<br/>• Description<br/>• Processing Software<br/>• Styles<br/>• Layout"]
+        Data["Data Elements<br/>• TextBlocks<br/>• TextLines<br/>• Words"]
     end
 
     subgraph Processing["Processing"]
-        MetaSchema[metadata_schema&#40;&#41;<br/>Preserves ALL metadata]
-        DataSchema[ALTO/PageXML Schema<br/>Structured extraction]
+        MetaSchema["metadata_schema()<br/>Preserves ALL metadata"]
+        DataSchema["ALTO/PageXML Schema<br/>Structured extraction"]
     end
 
     subgraph Output["PyArrow Output"]
-        MainTable[Main Table<br/>page_id | text | coords | ...]
-        MetaTable[Metadata Table<br/>page_id | format_type | namespaces | ...]
+        MainTable["Main Table<br/>page_id, text, coords, ..."]
+        MetaTable["Metadata Table<br/>page_id, format_type, namespaces, ..."]
         MainTable -.->|linked by page_id| MetaTable
     end
 
