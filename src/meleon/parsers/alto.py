@@ -1,16 +1,20 @@
-"""ALTO XML parser."""
+"""ALTO XML parser with Pydantic models and BaseXMLParser."""
 
 import logging
 import xml.etree.ElementTree as ET
-from typing import Dict, List
+
 import pyarrow as pa
 
-from .base import BaseParser
+from .base_xml import BaseXMLParser
 
 logger = logging.getLogger(__name__)
 
+INFINITY = float("inf")
+DEFAULT_COORDINATE = 0
+DEFAULT_SIZE = 0
 
-class ALTOParser(BaseParser):
+
+class ALTOParser(BaseXMLParser):
     def parse(self, file_path: str) -> pa.Table:
         """Parse ALTO XML file using pre-configured schema and level."""
         tree = ET.parse(file_path)
@@ -32,6 +36,7 @@ class ALTOParser(BaseParser):
         return pa.table(data, schema=self.schema)
 
     def detect_format(self, file_path: str) -> bool:
+        """Check if file is ALTO format."""
         try:
             tree = ET.parse(file_path)
             root = tree.getroot()
@@ -47,242 +52,160 @@ class ALTOParser(BaseParser):
         except (ET.ParseError, FileNotFoundError, OSError):
             return False
 
-    def _get_namespace(self, root: ET.Element) -> str:
-        if root.tag.startswith("{"):
-            return root.tag.split("}")[0] + "}"
-        return ""
-
-    def _extract_words(
-        self, root: ET.Element, namespace: str, data: Dict[str, List], field_names: set
-    ):
+    def _iter_page_elements(self, root, namespace):
+        """Iterator for page elements with their metadata."""
         for page in root.findall(f".//{namespace}Page"):
-            page_id = page.get("ID", "")
-            page_width = int(page.get("WIDTH", 0))
-            page_height = int(page.get("HEIGHT", 0))
+            page_data = {
+                "page_id": page.get("ID", ""),
+                "page_width": int(page.get("WIDTH", DEFAULT_SIZE)),
+                "page_height": int(page.get("HEIGHT", DEFAULT_SIZE)),
+            }
+            yield page, page_data
 
-            for block in page.findall(f".//{namespace}TextBlock"):
-                region_id = block.get("ID", "")
-                region_type = "TextBlock"
+    def _iter_block_elements(self, page, namespace):
+        """Iterator for text block elements."""
+        for block in page.findall(f".//{namespace}TextBlock"):
+            block_data = {
+                "region_id": block.get("ID", ""),
+                "region_type": "TextBlock",
+            }
+            yield block, block_data
 
-                for line in block.findall(f".//{namespace}TextLine"):
-                    line_id = line.get("ID", "")
+    def _iter_line_elements(self, block, namespace):
+        """Iterator for text line elements."""
+        for line in block.findall(f".//{namespace}TextLine"):
+            line_data = {"line_id": line.get("ID", "")}
+            yield line, line_data
 
-                    for string in line.findall(f".//{namespace}String"):
-                        row_data = self._extract_word_data(
-                            string,
-                            page_id,
-                            region_id,
-                            line_id,
-                            page_width,
-                            page_height,
-                            region_type,
-                            field_names,
-                        )
+    def _iter_string_elements(self, line, namespace):
+        """Iterator for string elements."""
+        for string in line.findall(f".//{namespace}String"):
+            yield string
+
+    def _extract_words(self, root, namespace, data, field_names):
+        """Extract word-level data using iterators for cleaner structure."""
+        for page, page_data in self._iter_page_elements(root, namespace):
+            for block, block_data in self._iter_block_elements(page, namespace):
+                for line, line_data in self._iter_line_elements(block, namespace):
+                    for string in self._iter_string_elements(line, namespace):
+                        context = {
+                            "page_id": page_data["page_id"],
+                            "region_id": block_data["region_id"],
+                            "line_id": line_data["line_id"],
+                            "page_width": page_data["page_width"],
+                            "page_height": page_data["page_height"],
+                            "region_type": block_data["region_type"],
+                        }
+                        element_data = self._extract_word_data(string, context)
                         for field_name in field_names:
-                            data[field_name].append(row_data.get(field_name))
+                            data[field_name].append(element_data.get(field_name))
 
-    def _extract_word_data(
-        self,
-        string: ET.Element,
-        page_id: str,
-        region_id: str,
-        line_id: str,
-        page_width: int,
-        page_height: int,
-        region_type: str,
-        field_names: set,
-    ) -> Dict:
-        row_data = {}
+    def _extract_word_data(self, string, context):
+        """Extract word-level data into dictionary."""
+        return {
+            "text": self._get_attribute_safe(string, "CONTENT", ""),
+            "page_id": context["page_id"],
+            "region_id": context["region_id"],
+            "line_id": context["line_id"],
+            "word_id": self._get_attribute_safe(string, "ID", ""),
+            "x": self._get_int_attribute(string, "HPOS", DEFAULT_COORDINATE),
+            "y": self._get_int_attribute(string, "VPOS", DEFAULT_COORDINATE),
+            "width": self._get_int_attribute(string, "WIDTH", DEFAULT_SIZE),
+            "height": self._get_int_attribute(string, "HEIGHT", DEFAULT_SIZE),
+            "confidence": self._get_float_attribute(string, "WC", None),
+            "style_refs": self._get_attribute_safe(string, "STYLEREFS", None),
+            "page_width": context["page_width"],
+            "page_height": context["page_height"],
+            "region_type": context["region_type"],
+        }
 
-        if "text" in field_names:
-            row_data["text"] = string.get("CONTENT", "")
-        if "page_id" in field_names:
-            row_data["page_id"] = page_id
-        if "region_id" in field_names:
-            row_data["region_id"] = region_id
-        if "line_id" in field_names:
-            row_data["line_id"] = line_id
-        if "word_id" in field_names:
-            row_data["word_id"] = string.get("ID", "")
-        if "x" in field_names:
-            row_data["x"] = int(string.get("HPOS", 0))
-        if "y" in field_names:
-            row_data["y"] = int(string.get("VPOS", 0))
-        if "width" in field_names:
-            row_data["width"] = int(string.get("WIDTH", 0))
-        if "height" in field_names:
-            row_data["height"] = int(string.get("HEIGHT", 0))
-        if "confidence" in field_names:
-            wc = string.get("WC")
-            row_data["confidence"] = float(wc) if wc else None
-        if "style_refs" in field_names:
-            row_data["style_refs"] = string.get("STYLEREFS")
-        if "page_width" in field_names:
-            row_data["page_width"] = page_width
-        if "page_height" in field_names:
-            row_data["page_height"] = page_height
-        if "region_type" in field_names:
-            row_data["region_type"] = region_type
+    def _extract_lines(self, root, namespace, data, field_names):
+        for page in self._findall_safe(root, ".//Page", namespace):
+            page_context = {
+                "page_id": self._get_attribute_safe(page, "ID", ""),
+                "page_width": self._get_int_attribute(page, "WIDTH", 0),
+                "page_height": self._get_int_attribute(page, "HEIGHT", 0),
+            }
 
-        return row_data
+            for block in self._findall_safe(page, ".//TextBlock", namespace):
+                region_context = {
+                    **page_context,
+                    "region_id": self._get_attribute_safe(block, "ID", ""),
+                    "region_type": "TextBlock",
+                }
 
-    def _extract_lines(
-        self, root: ET.Element, namespace: str, data: Dict[str, List], field_names: set
-    ):
-        for page in root.findall(f".//{namespace}Page"):
-            page_id = page.get("ID", "")
-            page_width = int(page.get("WIDTH", 0))
-            page_height = int(page.get("HEIGHT", 0))
-
-            for block in page.findall(f".//{namespace}TextBlock"):
-                region_id = block.get("ID", "")
-                region_type = "TextBlock"
-
-                for line in block.findall(f".//{namespace}TextLine"):
-                    line_data = self._aggregate_line_data(
-                        line,
-                        namespace,
-                        page_id,
-                        region_id,
-                        page_width,
-                        page_height,
-                        region_type,
-                        field_names,
-                    )
+                for line in self._findall_safe(block, ".//TextLine", namespace):
+                    element_data = self._aggregate_line_data(line, namespace, region_context)
                     for field_name in field_names:
-                        data[field_name].append(line_data.get(field_name))
+                        data[field_name].append(element_data.get(field_name))
 
-    def _extract_regions(
-        self, root: ET.Element, namespace: str, data: Dict[str, List], field_names: set
-    ):
-        for page in root.findall(f".//{namespace}Page"):
-            page_id = page.get("ID", "")
-            page_width = int(page.get("WIDTH", 0))
-            page_height = int(page.get("HEIGHT", 0))
+    def _extract_regions(self, root, namespace, data, field_names):
+        for page in self._findall_safe(root, ".//Page", namespace):
+            page_context = {
+                "page_id": self._get_attribute_safe(page, "ID", ""),
+                "page_width": self._get_int_attribute(page, "WIDTH", 0),
+                "page_height": self._get_int_attribute(page, "HEIGHT", 0),
+            }
 
-            for block in page.findall(f".//{namespace}TextBlock"):
-                region_data = self._aggregate_region_data(
-                    block, namespace, page_id, page_width, page_height, field_names
-                )
+            for block in self._findall_safe(page, ".//TextBlock", namespace):
+                element_data = self._aggregate_region_data(block, namespace, page_context)
                 for field_name in field_names:
-                    data[field_name].append(region_data.get(field_name))
+                    data[field_name].append(element_data.get(field_name))
 
-    def _aggregate_line_data(
-        self,
-        line: ET.Element,
-        namespace: str,
-        page_id: str,
-        region_id: str,
-        page_width: int,
-        page_height: int,
-        region_type: str,
-        field_names: set,
-    ) -> Dict:
-        line_id = line.get("ID", "")
-        line_texts = []
-        min_x, min_y = float("inf"), float("inf")
+    def _aggregate_strings(self, strings, context):
+        """Common aggregation logic for lines and regions."""
+        texts = []
+        min_x, min_y = INFINITY, INFINITY
         max_x, max_y = 0, 0
         confidences = []
 
-        for string in line.findall(f".//{namespace}String"):
-            line_texts.append(string.get("CONTENT", ""))
-            x = int(string.get("HPOS", 0))
-            y = int(string.get("VPOS", 0))
-            w = int(string.get("WIDTH", 0))
-            h = int(string.get("HEIGHT", 0))
+        for string in strings:
+            texts.append(self._get_attribute_safe(string, "CONTENT", ""))
+            x = self._get_int_attribute(string, "HPOS", DEFAULT_COORDINATE)
+            y = self._get_int_attribute(string, "VPOS", DEFAULT_COORDINATE)
+            w = self._get_int_attribute(string, "WIDTH", DEFAULT_SIZE)
+            h = self._get_int_attribute(string, "HEIGHT", DEFAULT_SIZE)
 
             min_x = min(min_x, x)
             min_y = min(min_y, y)
             max_x = max(max_x, x + w)
             max_y = max(max_y, y + h)
 
-            wc = string.get("WC")
-            if wc:
-                confidences.append(float(wc))
+            wc_value = self._get_float_attribute(string, "WC", None)
+            if wc_value is not None:
+                confidences.append(wc_value)
 
-        row_data = {}
-        if "text" in field_names:
-            row_data["text"] = " ".join(line_texts)
-        if "page_id" in field_names:
-            row_data["page_id"] = page_id
-        if "region_id" in field_names:
-            row_data["region_id"] = region_id
-        if "line_id" in field_names:
-            row_data["line_id"] = line_id
-        if "x" in field_names:
-            row_data["x"] = int(min_x) if min_x != float("inf") else 0
-        if "y" in field_names:
-            row_data["y"] = int(min_y) if min_y != float("inf") else 0
-        if "width" in field_names:
-            row_data["width"] = int(max_x - min_x) if min_x != float("inf") else 0
-        if "height" in field_names:
-            row_data["height"] = int(max_y - min_y) if min_y != float("inf") else 0
-        if "confidence" in field_names:
-            row_data["confidence"] = sum(confidences) / len(confidences) if confidences else None
-        if "page_width" in field_names:
-            row_data["page_width"] = page_width
-        if "page_height" in field_names:
-            row_data["page_height"] = page_height
-        if "region_type" in field_names:
-            row_data["region_type"] = region_type
+        return {
+            "text": " ".join(texts),
+            "page_id": context.get("page_id", ""),
+            "region_id": context.get("region_id", ""),
+            "line_id": context.get("line_id", ""),
+            "x": int(min_x) if min_x != INFINITY else DEFAULT_COORDINATE,
+            "y": int(min_y) if min_y != INFINITY else DEFAULT_COORDINATE,
+            "width": int(max_x - min_x) if min_x != INFINITY else DEFAULT_SIZE,
+            "height": int(max_y - min_y) if min_y != INFINITY else DEFAULT_SIZE,
+            "confidence": sum(confidences) / len(confidences) if confidences else None,
+            "page_width": context.get("page_width", 0),
+            "page_height": context.get("page_height", 0),
+            "region_type": context.get("region_type", ""),
+        }
 
-        return row_data
+    def _aggregate_line_data(self, line, namespace, context):
+        """Aggregate data at line level."""
+        line_id = self._get_attribute_safe(line, "ID", "")
+        strings = self._findall_safe(line, ".//String", namespace)
+        line_context = {**context, "line_id": line_id}
+        return self._aggregate_strings(strings, line_context)
 
-    def _aggregate_region_data(
-        self,
-        block: ET.Element,
-        namespace: str,
-        page_id: str,
-        page_width: int,
-        page_height: int,
-        field_names: set,
-    ) -> Dict:
-        region_id = block.get("ID", "")
+    def _aggregate_region_data(self, block, namespace, context):
+        """Aggregate data at region level."""
+        region_id = self._get_attribute_safe(block, "ID", "")
         region_type = "TextBlock"
-        region_texts = []
-        min_x, min_y = float("inf"), float("inf")
-        max_x, max_y = 0, 0
-        confidences = []
 
-        for line in block.findall(f".//{namespace}TextLine"):
-            for string in line.findall(f".//{namespace}String"):
-                region_texts.append(string.get("CONTENT", ""))
-                x = int(string.get("HPOS", 0))
-                y = int(string.get("VPOS", 0))
-                w = int(string.get("WIDTH", 0))
-                h = int(string.get("HEIGHT", 0))
+        # Collect all strings from all lines in the block
+        strings = []
+        for line in self._findall_safe(block, ".//TextLine", namespace):
+            strings.extend(self._findall_safe(line, ".//String", namespace))
 
-                min_x = min(min_x, x)
-                min_y = min(min_y, y)
-                max_x = max(max_x, x + w)
-                max_y = max(max_y, y + h)
-
-                wc = string.get("WC")
-                if wc:
-                    confidences.append(float(wc))
-
-        row_data = {}
-        if "text" in field_names:
-            row_data["text"] = " ".join(region_texts)
-        if "page_id" in field_names:
-            row_data["page_id"] = page_id
-        if "region_id" in field_names:
-            row_data["region_id"] = region_id
-        if "x" in field_names:
-            row_data["x"] = int(min_x) if min_x != float("inf") else 0
-        if "y" in field_names:
-            row_data["y"] = int(min_y) if min_y != float("inf") else 0
-        if "width" in field_names:
-            row_data["width"] = int(max_x - min_x) if min_x != float("inf") else 0
-        if "height" in field_names:
-            row_data["height"] = int(max_y - min_y) if min_y != float("inf") else 0
-        if "confidence" in field_names:
-            row_data["confidence"] = sum(confidences) / len(confidences) if confidences else None
-        if "page_width" in field_names:
-            row_data["page_width"] = page_width
-        if "page_height" in field_names:
-            row_data["page_height"] = page_height
-        if "region_type" in field_names:
-            row_data["region_type"] = region_type
-
-        return row_data
+        region_context = {**context, "region_id": region_id, "region_type": region_type}
+        return self._aggregate_strings(strings, region_context)

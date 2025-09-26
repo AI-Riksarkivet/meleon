@@ -12,12 +12,14 @@ dependencies = [
     "pydantic>=2.11.9",
     "pyarrow>=2.11.9",
     "narwhals>=2.5.0",
+    "pyyaml>=6.0.3",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.4.2",
-    "ruff>=2.5.0",
+    "ruff>=0.8.0",
+    "ty>=0.0.1a21",
 ]
 cli = [
     "typer>=0.19.2",

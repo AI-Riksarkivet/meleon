@@ -1,7 +1,7 @@
 """Streaming and parallel processors for batch operations."""
 
 import logging
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Iterator, List, Optional, Union
 
@@ -51,7 +51,11 @@ class StreamingBatchProcessor:
 
                 if writer is None:
                     if output_path.suffix == ".parquet":
-                        writer_path = output_path if current_shard == 0 else output_path.with_suffix(f".{current_shard}.parquet")
+                        writer_path = (
+                            output_path
+                            if current_shard == 0
+                            else output_path.with_suffix(f".{current_shard}.parquet")
+                        )
                     else:
                         output_path.mkdir(parents=True, exist_ok=True)
                         writer_path = output_path / f"shard_{current_shard:05d}.parquet"
@@ -95,21 +99,25 @@ class StreamingBatchProcessor:
                 futures.append(future)
 
                 if len(futures) >= self.config.streaming.buffer_size:
-                    for completed in as_completed(futures[:self.config.streaming.buffer_size]):
+                    for completed in as_completed(futures[: self.config.streaming.buffer_size]):
                         try:
                             table = completed.result()
                             if table and table.num_rows > 0:
-                                for batch in table.to_batches(max_chunksize=self.config.processing.batch_row_size):
+                                for batch in table.to_batches(
+                                    max_chunksize=self.config.processing.batch_row_size
+                                ):
                                     yield batch
                         except Exception as e:
                             logger.error(f"Error processing chunk: {e}")
-                    futures = futures[self.config.streaming.buffer_size:]
+                    futures = futures[self.config.streaming.buffer_size :]
 
             for completed in as_completed(futures):
                 try:
                     table = completed.result()
                     if table and table.num_rows > 0:
-                        for batch in table.to_batches(max_chunksize=self.config.processing.batch_row_size):
+                        for batch in table.to_batches(
+                            max_chunksize=self.config.processing.batch_row_size
+                        ):
                             yield batch
                 except Exception as e:
                     logger.error(f"Error processing chunk: {e}")
@@ -121,7 +129,6 @@ class StreamingBatchProcessor:
         Yields:
             PyArrow Tables that fit within memory constraints
         """
-        import psutil
 
         memory_limit_bytes = self.config.processing.memory_limit_mb * 1024 * 1024
         accumulated_tables = []
@@ -222,9 +229,6 @@ class StreamingBatchProcessor:
 
     def _sequential_process(self) -> Iterator[pa.RecordBatch]:
         """Process files sequentially."""
-        accumulated_rows = []
-        current_row_count = 0
-
         for file_path in self.files:
             try:
                 table = self.parser.parse(str(file_path))
@@ -306,9 +310,12 @@ class HybridProcessor(StreamingBatchProcessor):
                     try:
                         table = future.result()
                         if table and table.num_rows > 0:
-                            for batch in table.to_batches(max_chunksize=self.config.processing.batch_row_size):
+                            for batch in table.to_batches(
+                                max_chunksize=self.config.processing.batch_row_size
+                            ):
                                 if self.config.streaming.enable_backpressure:
                                     import time
+
                                     time.sleep(0.001)
                                 yield batch
                     except Exception as e:

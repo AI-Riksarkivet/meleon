@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PcGts xmlns="http://schema.primaresearch.org/PAGE/gts/pagecontent/2013-07-15">
+  <Metadata>
+    <Creator>Meleon Converter</Creator>
+  </Metadata>
+  <Page imageFilename="page_1.jpg" imageWidth="1000" imageHeight="1500">
+    <TextRegion id="block_3" type="paragraph">
+      <Coords points="50,50 210,50 210,75 50,75" />
+      <TextLine id="line_4" custom="readingOrder {index:0;}">
+        <Coords points="50,50 210,50 210,75 50,75" />
+        <TextEquiv>
+          <Unicode>Another document</Unicode>
+        </TextEquiv>
+        <Word id="word_9" conf="0.99">
+          <Coords points="50,50 120,50 120,75 50,75" />
+          <TextEquiv>
+            <Unicode>Another</Unicode>
+          </TextEquiv>
+        </Word>
+        <Word id="word_10" conf="0.97">
+          <Coords points="130,50 210,50 210,75 130,75" />
+          <TextEquiv>
+            <Unicode>document</Unicode>
+          </TextEquiv>
+        </Word>
+      </TextLine>
+    </TextRegion>
+    <TextRegion id="block_4" type="paragraph">
+      <Coords points="50,150 245,150 245,175 50,175" />
+      <TextLine id="line_6" custom="readingOrder {index:0;}">
+        <Coords points="50,150 245,150 245,175 50,175" />
+        <TextEquiv>
+          <Unicode>Perfect quality line</Unicode>
+        </TextEquiv>
+        <Word id="word_14" conf="1.0">
+          <Coords points="50,150 120,150 120,175 50,175" />
+          <TextEquiv>
+            <Unicode>Perfect</Unicode>
+          </TextEquiv>
+        </Word>
+        <Word id="word_15" conf="0.98">
+          <Coords points="130,150 195,150 195,175 130,175" />
+          <TextEquiv>
+            <Unicode>quality</Unicode>
+          </TextEquiv>
+        </Word>
+        <Word id="word_16" conf="0.96">
+          <Coords points="205,150 245,150 245,175 205,175" />
+          <TextEquiv>
+            <Unicode>line</Unicode>
+          </TextEquiv>
+        </Word>
+      </TextLine>
+    </TextRegion>
+  </Page>
+  <Page imageFilename="page_2.jpg" imageWidth="1000" imageHeight="1500">
+    <TextRegion id="block_3" type="paragraph">
+      <Coords points="50,50 210,50 210,75 50,75" />
+      <TextLine id="line_4" custom="readingOrder {index:0;}">
+        <Coords points="50,50 210,50 210,75 50,75" />
+        <TextEquiv>
+          <Unicode>Another document</Unicode>
+        </TextEquiv>
+        <Word id="word_9" conf="0.99">
+          <Coords points="50,50 120,50 120,75 50,75" />
+          <TextEquiv>
+            <Unicode>Another</Unicode>
+          </TextEquiv>
+        </Word>
+        <Word id="word_10" conf="0.97">
+          <Coords points="130,50 210,50 210,75 130,75" />
+          <TextEquiv>
+            <Unicode>document</Unicode>
+          </TextEquiv>
+        </Word>
+      </TextLine>
+    </TextRegion>
+    <TextRegion id="block_4" type="paragraph">
+      <Coords points="50,150 245,150 245,175 50,175" />
+      <TextLine id="line_6" custom="readingOrder {index:0;}">
+        <Coords points="50,150 245,150 245,175 50,175" />
+        <TextEquiv>
+          <Unicode>Perfect quality line</Unicode>
+        </TextEquiv>
+        <Word id="word_14" conf="1.0">
+          <Coords points="50,150 120,150 120,175 50,175" />
+          <TextEquiv>
+            <Unicode>Perfect</Unicode>
+          </TextEquiv>
+        </Word>
+        <Word id="word_15" conf="0.98">
+          <Coords points="130,150 195,150 195,175 130,175" />
+          <TextEquiv>
+            <Unicode>quality</Unicode>
+          </TextEquiv>
+        </Word>
+        <Word id="word_16" conf="0.96">
+          <Coords points="205,150 245,150 245,175 205,175" />
+          <TextEquiv>
+            <Unicode>line</Unicode>
+          </TextEquiv>
+        </Word>
+      </TextLine>
+    </TextRegion>
+  </Page>
+</PcGts>

@@ -39,7 +39,6 @@ def process_with_narwhals(
     return transformed_table, metadata_table
 
 
-
 def filter_by_confidence(df: Any, min_confidence: float = 0.8) -> Any:
     """Filter words by confidence threshold."""
     return df.filter(nw.col("confidence") >= min_confidence)

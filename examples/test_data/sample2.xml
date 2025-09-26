@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alto xmlns="http://www.loc.gov/standards/alto/ns-v3#">
+    <Description>
+        <MeasurementUnit>pixel</MeasurementUnit>
+    </Description>
+    <Layout>
+        <Page ID="page_2" WIDTH="1200" HEIGHT="1600">
+            <PrintSpace>
+                <TextBlock ID="block_3">
+                    <TextLine ID="line_4">
+                        <String ID="word_9" CONTENT="Another" HPOS="50" VPOS="50" WIDTH="70" HEIGHT="25" WC="0.99"/>
+                        <String ID="word_10" CONTENT="document" HPOS="130" VPOS="50" WIDTH="80" HEIGHT="25" WC="0.97"/>
+                    </TextLine>
+                    <TextLine ID="line_5">
+                        <String ID="word_11" CONTENT="With" HPOS="50" VPOS="80" WIDTH="45" HEIGHT="25" WC="0.92"/>
+                        <String ID="word_12" CONTENT="lower" HPOS="105" VPOS="80" WIDTH="50" HEIGHT="25" WC="0.91"/>
+                        <String ID="word_13" CONTENT="scores" HPOS="165" VPOS="80" WIDTH="60" HEIGHT="25" WC="0.90"/>
+                    </TextLine>
+                </TextBlock>
+                <TextBlock ID="block_4">
+                    <TextLine ID="line_6">
+                        <String ID="word_14" CONTENT="Perfect" HPOS="50" VPOS="150" WIDTH="70" HEIGHT="25" WC="1.0"/>
+                        <String ID="word_15" CONTENT="quality" HPOS="130" VPOS="150" WIDTH="65" HEIGHT="25" WC="0.98"/>
+                        <String ID="word_16" CONTENT="line" HPOS="205" VPOS="150" WIDTH="40" HEIGHT="25" WC="0.96"/>
+                    </TextLine>
+                </TextBlock>
+            </PrintSpace>
+        </Page>
+    </Layout>
+</alto>

@@ -80,9 +80,7 @@ def batch_process(
 
                             if output_path.suffix == ".parquet":
                                 writer = pq.ParquetWriter(
-                                    str(output_path),
-                                    schema,
-                                    compression="snappy"
+                                    str(output_path), schema, compression="snappy"
                                 )
 
                         if writer and output_path.suffix == ".parquet":

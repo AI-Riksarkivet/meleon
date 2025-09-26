@@ -19,10 +19,9 @@ from meleon import (
     BatchProcessorConfig,
     schemas,
 )
-from meleon.converters.narwhals_adapter import filter_by_confidence
 
 
-def create_test_files(num_files: int = 10) -> list[Path]:
+def create_test_files(num_files: int = 10) -> tuple[list[Path], Path]:
     """Create multiple test XML files for batch processing."""
     temp_dir = Path(tempfile.mkdtemp(prefix="meleon_test_"))
     files = []
@@ -71,10 +70,7 @@ def workflow_1_batch_to_parquet_shards():
     dataset = ds.dataset(output_dir, format="parquet")
     print(f"\n✓ Created lazy dataset with {dataset.count_rows()} total rows")
 
-    scanner = dataset.scanner(
-        columns=["text", "confidence"],
-        filter=pc.field("confidence") > 0.85
-    )
+    scanner = dataset.scanner(columns=["text", "confidence"], filter=pc.field("confidence") > 0.85)
     filtered_table = scanner.to_table()
     print(f"✓ Lazy query: {filtered_table.num_rows} rows with confidence > 0.85")
 
@@ -107,7 +103,8 @@ def workflow_2_streaming_transform():
             writer = pq.ParquetWriter(str(output_parquet), batch.schema)
 
         if "confidence" in batch.schema.names:
-            mask = pc.greater(batch.column("confidence"), pa.scalar(0.9))
+            # Use greater than 0.9 for filtering
+            mask = batch.column("confidence") > pa.scalar(0.9)
             filtered_batch = batch.filter(mask)
         else:
             filtered_batch = batch
@@ -146,24 +143,18 @@ def workflow_3_lazy_operations():
     print(f"Creating partitioned dataset from {len(files)} files...")
     lazy_dataset = processor.to_lazy_dataset(dataset_dir)
 
-    print(f"✓ Created lazy dataset (not loaded in memory)")
+    print("✓ Created lazy dataset (not loaded in memory)")
     print(f"  Total rows: {lazy_dataset.count_rows()}")
 
     print("\nLazy operations (data not loaded):")
 
-    high_confidence = lazy_dataset.scanner(
-        filter=pc.field("confidence") > 0.95
-    ).count_rows()
+    high_confidence = lazy_dataset.scanner(filter=pc.field("confidence") > 0.95).count_rows()
     print(f"  - High confidence words: {high_confidence}")
 
-    projection = lazy_dataset.scanner(
-        columns=["text", "confidence"]
-    )
-    print(f"  - Column projection defined (text, confidence)")
+    projection = lazy_dataset.scanner(columns=["text", "confidence"])
+    print("  - Column projection defined (text, confidence)")
 
-    aggregated = projection.to_table().group_by(["text"]).aggregate([
-        ("confidence", "mean")
-    ])
+    aggregated = projection.to_table().group_by(["text"]).aggregate([("confidence", "mean")])
     print(f"  - Aggregated to {len(aggregated)} unique words")
 
     print("\nMemory-efficient batch iteration:")
@@ -206,9 +197,7 @@ def workflow_4_parallel_with_narwhals():
 
         filtered_df = nw_df.filter(nw.col("confidence") >= 0.85)
 
-        transformed_df = filtered_df.with_columns(
-            text_length=nw.col("text").str.len_chars()
-        )
+        transformed_df = filtered_df.with_columns(text_length=nw.col("text").str.len_chars())
 
         result_table = nw.to_native(transformed_df)
 

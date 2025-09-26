@@ -3,7 +3,6 @@
 from pathlib import Path
 from typing import Literal, Optional
 
-import pyarrow as pa
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -133,9 +132,7 @@ class ParquetConfig(BaseModel):
         description="Use legacy dataset API",
     )
 
-    existing_data_behavior: Literal[
-        "error", "overwrite_or_ignore", "delete_matching"
-    ] = Field(
+    existing_data_behavior: Literal["error", "overwrite_or_ignore", "delete_matching"] = Field(
         default="overwrite_or_ignore",
         description="How to handle existing data",
     )

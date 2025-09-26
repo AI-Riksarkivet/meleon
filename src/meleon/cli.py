@@ -11,10 +11,11 @@ from rich.table import Table
 
 from . import __version__
 from .config import BatchProcessorConfig
-from .parsers import ALTOParser, PageXMLParser
-from .processors import AdaptiveProcessor, StreamingBatchProcessor
-from .schemas import ALTO_SCHEMA, PAGEXML_SCHEMA
-from .serializers import ALTOSerializer, PageXMLSerializer
+from .services import (
+    ProcessingService,
+    StatsService,
+    TransformationService,
+)
 
 app = typer.Typer(
     name="meleon",
@@ -42,17 +43,10 @@ def parse(
         console=console,
     ) as progress:
         task = progress.add_task("Parsing XML file...", total=None)
-
-        if format == "auto":
-            format = "alto" if "alto" in str(input_file).lower() else "pagexml"
-
-        if format == "alto":
-            parser = ALTOParser(ALTO_SCHEMA, level)
-        else:
-            parser = PageXMLParser(PAGEXML_SCHEMA, level)
+        service = ProcessingService()
 
         try:
-            table = parser.parse(str(input_file))
+            table = service.parse_single_file(input_file, format, level)
             progress.update(task, description=f"Parsed {table.num_rows} {level}s")
 
             if output:
@@ -68,7 +62,7 @@ def parse(
 
                 stats_table.add_row("Total rows", str(table.num_rows))
                 stats_table.add_row("Columns", str(len(table.column_names)))
-                stats_table.add_row("Memory usage", f"{table.nbytes / (1024*1024):.2f} MB")
+                stats_table.add_row("Memory usage", f"{table.nbytes / (1024 * 1024):.2f} MB")
 
                 console.print(stats_table)
 
@@ -88,8 +82,12 @@ def batch(
     batch_row_size: int = typer.Option(10000, "--batch-rows", help="Rows per batch"),
     shard_size: int = typer.Option(100000, "--shard-size", help="Rows per shard"),
     max_workers: Optional[int] = typer.Option(None, "--workers", "-w", help="Max parallel workers"),
-    mode: str = typer.Option("streaming", "--mode", "-m", help="Processing mode: streaming, parallel, hybrid"),
-    compression: str = typer.Option("snappy", "--compression", "-c", help="Compression: snappy, gzip, lz4"),
+    mode: str = typer.Option(
+        "streaming", "--mode", "-m", help="Processing mode: streaming, parallel, hybrid"
+    ),
+    compression: str = typer.Option(
+        "snappy", "--compression", "-c", help="Compression: snappy, gzip, lz4"
+    ),
 ):
     """Batch process XML files to Parquet with streaming."""
     files = list(input_dir.glob(pattern))
@@ -105,18 +103,18 @@ def batch(
     config.processing.batch_row_size = batch_row_size
     config.processing.shard_size = shard_size
     config.processing.max_workers = max_workers
-    config.processing.processing_mode = mode
-    config.processing.compression = compression
+    # Cast to proper literal types
+    from typing import cast
+    from typing import Literal as L
 
-    if format == "auto":
-        format = "alto" if "alto" in str(files[0]).lower() else "pagexml"
+    config.processing.processing_mode = cast(
+        L["sequential", "parallel", "streaming", "hybrid"], mode
+    )
+    config.processing.compression = cast(
+        L["snappy", "gzip", "brotli", "lz4", "zstd", "none"], compression
+    )
 
-    if format == "alto":
-        parser = ALTOParser(ALTO_SCHEMA, level)
-    else:
-        parser = PageXMLParser(PAGEXML_SCHEMA, level)
-
-    processor = StreamingBatchProcessor(files, parser, config)
+    service = ProcessingService(config)
 
     with Progress(
         SpinnerColumn(),
@@ -126,7 +124,7 @@ def batch(
         task = progress.add_task(f"Processing {len(files)} files...", total=len(files))
 
         try:
-            total_rows = processor.stream_to_parquet(output)
+            total_rows = service.batch_process_files(files, output, format, level, mode)
             progress.update(task, completed=len(files))
 
             console.print(f"[green]✓[/green] Processed {len(files)} files")
@@ -146,7 +144,9 @@ def stream(
     level: str = typer.Option("word", "--level", "-l", help="Extraction level"),
     shard_size: int = typer.Option(100000, "--shard-size", help="Rows per shard"),
     memory_limit: int = typer.Option(1024, "--memory-limit", help="Memory limit in MB"),
-    adaptive: bool = typer.Option(True, "--adaptive/--no-adaptive", help="Adapt to system resources"),
+    adaptive: bool = typer.Option(
+        True, "--adaptive/--no-adaptive", help="Adapt to system resources"
+    ),
 ):
     """Stream process with memory limits and sharding."""
     files = list(input_dir.glob(pattern))
@@ -159,23 +159,12 @@ def stream(
 
     config = BatchProcessorConfig()
     config.processing.shard_size = shard_size
-    config.processing.memory_limit_mb = memory_limit
-    config.processing.processing_mode = "streaming"
-    config.streaming.incremental_write = True
-
-    if format == "auto":
-        format = "alto" if "alto" in str(files[0]).lower() else "pagexml"
-
-    if format == "alto":
-        parser = ALTOParser(ALTO_SCHEMA, level)
-    else:
-        parser = PageXMLParser(PAGEXML_SCHEMA, level)
-
-    processor_class = AdaptiveProcessor if adaptive else StreamingBatchProcessor
-    processor = processor_class(files, parser, config)
+    service = ProcessingService(config)
 
     try:
-        total_rows = processor.stream_to_parquet(output_dir)
+        total_rows = service.stream_process_with_memory_limit(
+            files, output_dir, format, level, memory_limit, adaptive
+        )
         console.print(f"[green]✓[/green] Streamed {total_rows:,} rows to {output_dir}")
 
     except Exception as e:
@@ -187,30 +176,19 @@ def stream(
 def transform(
     input_parquet: Path = typer.Argument(..., help="Input Parquet file or dataset"),
     output: Path = typer.Argument(..., help="Output Parquet file"),
-    min_confidence: float = typer.Option(0.8, "--min-confidence", help="Minimum confidence threshold"),
+    min_confidence: float = typer.Option(
+        0.8, "--min-confidence", help="Minimum confidence threshold"
+    ),
     columns: Optional[List[str]] = typer.Option(None, "--columns", "-c", help="Columns to select"),
 ):
     """Transform Parquet data with filters and projections."""
-    import pyarrow.compute as pc
-    import pyarrow.dataset as ds
-    import pyarrow.parquet as pq
-
     console.print(f"[cyan]Transforming {input_parquet}...[/cyan]")
 
     try:
-        dataset = ds.dataset(input_parquet, format="parquet")
-
-        filters = None
-        if min_confidence > 0:
-            filters = pc.field("confidence") >= min_confidence
-
-        scanner = dataset.scanner(columns=columns, filter=filters)
-
-        table = scanner.to_table()
-
-        pq.write_table(table, str(output), compression="snappy")
-
-        console.print(f"[green]✓[/green] Transformed {table.num_rows:,} rows to {output}")
+        num_rows = TransformationService.transform_parquet(
+            input_parquet, output, min_confidence, columns
+        )
+        console.print(f"[green]✓[/green] Transformed {num_rows:,} rows to {output}")
 
     except Exception as e:
         console.print(f"[red]✗[/red] Error: {e}")
@@ -251,31 +229,23 @@ def stats(
     parquet_file: Path = typer.Argument(..., help="Parquet file to analyze"),
 ):
     """Show statistics for a Parquet file or dataset."""
-    import pyarrow.parquet as pq
-
     try:
-        parquet_file = pq.ParquetFile(str(parquet_file))
-        metadata = parquet_file.metadata
+        stats = StatsService.get_parquet_stats(parquet_file)
 
-        stats_table = Table(title=f"Parquet Statistics")
+        stats_table = Table(title="Parquet Statistics")
         stats_table.add_column("Metric", style="cyan")
         stats_table.add_column("Value", style="magenta")
 
-        stats_table.add_row("Number of rows", f"{metadata.num_rows:,}")
-        stats_table.add_row("Number of columns", str(metadata.num_columns))
-        stats_table.add_row("Number of row groups", str(metadata.num_row_groups))
-        stats_table.add_row("Format version", metadata.format_version)
-        stats_table.add_row("Created by", metadata.created_by or "Unknown")
+        stats_table.add_row("Number of rows", f"{stats['num_rows']:,}")
+        stats_table.add_row("Number of columns", str(stats["num_columns"]))
+        stats_table.add_row("Number of row groups", str(stats["num_row_groups"]))
+        stats_table.add_row("Format version", stats["format_version"])
+        stats_table.add_row("Created by", stats["created_by"])
+        stats_table.add_row("Total size", f"{stats['total_size_mb']:.2f} MB")
+        stats_table.add_row("Compressed size", f"{stats['compressed_size_mb']:.2f} MB")
 
-        total_size = sum(rg.total_byte_size for rg in metadata.row_groups)
-        stats_table.add_row("Total size", f"{total_size / (1024*1024):.2f} MB")
-
-        compressed_size = sum(rg.total_compressed_size for rg in metadata.row_groups)
-        stats_table.add_row("Compressed size", f"{compressed_size / (1024*1024):.2f} MB")
-
-        if total_size > 0:
-            compression_ratio = (1 - compressed_size / total_size) * 100
-            stats_table.add_row("Compression ratio", f"{compression_ratio:.1f}%")
+        if "compression_ratio" in stats:
+            stats_table.add_row("Compression ratio", f"{stats['compression_ratio']:.1f}%")
 
         console.print(stats_table)
 
